@@ -362,6 +362,12 @@ class ClassFileParser {
                                         const u1* const runtime_invisible_annotations,
                                         int runtime_invisible_annotations_length,
                                         TRAPS);
+  AnnotationArray* assemble_annotations(const u1* runtime_visible_annotations,
+                                        int runtime_visible_annotations_length,
+                                        const u1* runtime_alloc_annotations,
+                                        int runtime_alloc_annotations_length,
+                                        const u1* runtime_invisible_annotations,
+                                        int runtime_invisible_annotations_length, TRAPS);
 
   void set_precomputed_flags(InstanceKlass* k);
 
@@ -551,6 +557,8 @@ class ClassFileParser {
                                int runtime_visible_type_annotations_length,
                                const u1* runtime_invisible_type_annotations,
                                int runtime_invisible_type_annotations_length,
+                               const u1* runtime_alloc_type_annotations,
+                               int runtime_alloc_type_annotations_length,
                                const u1* annotation_default,
                                int annotation_default_length,
                                TRAPS);

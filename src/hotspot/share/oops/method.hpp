@@ -97,6 +97,11 @@ class Method : public Metadata {
 
   JFR_ONLY(DEFINE_TRACE_FLAG;)
 
+  // <underscore> NULL if there is no alloc anno.
+  AnnotationArray* _alloc_anno;
+  // <underscore> NULL if there is no alloc anno. Cache of final bcis where we alloc in gens.
+  Array<u2>* _alloc_anno_cache;
+
 #ifndef PRODUCT
   int               _compiled_invocation_count;  // Number of nmethod invocations so far (for perf. debugging)
 #endif
@@ -164,6 +169,11 @@ class Method : public Metadata {
   Symbol* generic_signature() const              { int idx = generic_signature_index(); return ((idx != 0) ? constants()->symbol_at(idx) : (Symbol*)NULL); }
   int generic_signature_index() const            { return constMethod()->generic_signature_index(); }
   void set_generic_signature_index(int index)    { constMethod()->set_generic_signature_index(index); }
+
+  AnnotationArray* alloc_anno()                  { return _alloc_anno; }       // <underscore>
+  void set_alloc_anno(AnnotationArray* ptr)      { _alloc_anno = ptr; }        // <underscore>
+  Array<u2>* alloc_anno_cache()                  { return _alloc_anno_cache; } // <underscore>
+  void set_alloc_anno_cache(Array<u2>* ptr)      { _alloc_anno_cache = ptr; }  // <underscore>
 
   // annotations support
   AnnotationArray* annotations() const           {
@@ -721,6 +731,7 @@ public:
   // interpreter support
   static ByteSize const_offset()                 { return byte_offset_of(Method, _constMethod       ); }
   static ByteSize access_flags_offset()          { return byte_offset_of(Method, _access_flags      ); }
+  static ByteSize alloc_anno_offset()                  { return byte_offset_of(Method, _alloc_anno); }
   static ByteSize from_compiled_offset()         { return byte_offset_of(Method, _from_compiled_entry); }
   static ByteSize code_offset()                  { return byte_offset_of(Method, _code); }
   static ByteSize method_data_offset()           {
