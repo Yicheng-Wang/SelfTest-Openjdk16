@@ -154,7 +154,11 @@ class CollectedHeap : public CHeapObj<mtInternal> {
                                       size_t requested_size,
                                       size_t* actual_size);
 
-  // Reinitialize tlabs before resuming mutators.
+  virtual HeapWord* allocate_new_tklab(size_t min_size,
+                                 size_t requested_size,
+                                 size_t* actual_size);
+
+    // Reinitialize tlabs before resuming mutators.
   virtual void resize_all_tlabs();
 
   // Raw memory allocation facilities
@@ -281,7 +285,7 @@ class CollectedHeap : public CHeapObj<mtInternal> {
   }
   GCCause::Cause gc_cause() { return _gc_cause; }
 
-  oop obj_allocate(Klass* klass, int size, TRAPS);
+  oop obj_allocate(Klass* klass, int alloc_gen, int size, TRAPS);
   virtual oop array_allocate(Klass* klass, int size, int length, bool do_zero, TRAPS);
   oop class_allocate(Klass* klass, int size, TRAPS);
 

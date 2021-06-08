@@ -43,8 +43,8 @@ protected:
 
 private:
   // Allocate from the current thread's TLAB, with broken-out slow path.
-  HeapWord* allocate_inside_tlab(Allocation& allocation) const;
-  HeapWord* allocate_inside_tlab_slow(Allocation& allocation) const;
+  HeapWord* allocate_inside_tlab(Allocation& allocation,int alloc_gen) const;
+  HeapWord* allocate_inside_tlab_slow(Allocation& allocation,int alloc_gen) const;
   HeapWord* allocate_outside_tlab(Allocation& allocation) const;
 
 protected:
@@ -63,14 +63,14 @@ protected:
 
   // Raw memory allocation. This will try to do a TLAB allocation, and otherwise fall
   // back to calling CollectedHeap::mem_allocate().
-  HeapWord* mem_allocate(Allocation& allocation) const;
+  HeapWord* mem_allocate(Allocation& allocation, int alloc_gen) const;
 
   virtual MemRegion obj_memory_range(oop obj) const {
     return MemRegion(cast_from_oop<HeapWord*>(obj), _word_size);
   }
 
 public:
-  oop allocate() const;
+  oop allocate(int alloc_gen = 0) const;
   virtual oop initialize(HeapWord* mem) const = 0;
 };
 

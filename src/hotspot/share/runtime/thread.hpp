@@ -399,6 +399,9 @@ class Thread: public ThreadShadow {
 
  private:
   ThreadLocalAllocBuffer _tlab;                 // Thread-local eden
+
+  ThreadLocalAllocBuffer _tklab;
+
   jlong _allocated_bytes;                       // Cumulative number of bytes allocated on
                                                 // the Java heap
   ThreadHeapSampler _heap_sampler;              // For use when sampling the memory.
@@ -597,9 +600,15 @@ class Thread: public ThreadShadow {
 
   // Thread-Local Allocation Buffer (TLAB) support
   ThreadLocalAllocBuffer& tlab()                 { return _tlab; }
+  ThreadLocalAllocBuffer& tklab()                 { return _tklab; }
+
   void initialize_tlab() {
     if (UseTLAB) {
+        //Thread* my_thread = tlab().get_my_thread();
+        //tlab().set_my_thread(my_thread);
+        //tklab().set_my_thread(my_thread);
       tlab().initialize();
+      tklab().initialize();
     }
   }
 

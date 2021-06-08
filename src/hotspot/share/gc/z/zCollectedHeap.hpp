@@ -52,6 +52,9 @@ private:
   virtual HeapWord* allocate_new_tlab(size_t min_size,
                                       size_t requested_size,
                                       size_t* actual_size);
+  virtual HeapWord* allocate_new_tklab(size_t min_size,
+                                        size_t requested_size,
+                                        size_t* actual_size);
 
 public:
   static ZCollectedHeap* heap();

@@ -265,22 +265,30 @@ HeapWord* MemAllocator::allocate_outside_tlab(Allocation& allocation) const {
   return mem;
 }
 
-HeapWord* MemAllocator::allocate_inside_tlab(Allocation& allocation) const {
+HeapWord* MemAllocator::allocate_inside_tlab(Allocation& allocation, int alloc_gen) const {
   assert(UseTLAB, "should use UseTLAB");
 
   // Try allocating from an existing TLAB.
-  HeapWord* mem = _thread->tlab().allocate(_word_size);
+  HeapWord* mem;
+  if(!alloc_gen){
+      mem = _thread->tlab().allocate(_word_size);
+  }
+
+  else
+      mem = _thread->tklab().allocate(_word_size);
+
   if (mem != NULL) {
     return mem;
   }
 
   // Try refilling the TLAB and allocating the object in it.
-  return allocate_inside_tlab_slow(allocation);
+  return allocate_inside_tlab_slow(allocation,alloc_gen);
 }
 
-HeapWord* MemAllocator::allocate_inside_tlab_slow(Allocation& allocation) const {
+HeapWord* MemAllocator::allocate_inside_tlab_slow(Allocation& allocation, int alloc_gen) const {
   HeapWord* mem = NULL;
-  ThreadLocalAllocBuffer& tlab = _thread->tlab();
+
+  ThreadLocalAllocBuffer& tlab = alloc_gen ? _thread->tklab() : _thread->tlab();
 
   if (JvmtiExport::should_post_sampled_object_alloc()) {
     tlab.set_back_allocation_end();
@@ -315,7 +323,10 @@ HeapWord* MemAllocator::allocate_inside_tlab_slow(Allocation& allocation) const 
   // Allocate a new TLAB requesting new_tlab_size. Any size
   // between minimal and new_tlab_size is accepted.
   size_t min_tlab_size = ThreadLocalAllocBuffer::compute_min_size(_word_size);
-  mem = Universe::heap()->allocate_new_tlab(min_tlab_size, new_tlab_size, &allocation._allocated_tlab_size);
+  if(!alloc_gen)
+      mem = Universe::heap()->allocate_new_tlab(min_tlab_size, new_tlab_size, &allocation._allocated_tlab_size);
+  else
+      mem = Universe::heap()->allocate_new_tklab(min_tlab_size, new_tlab_size, &allocation._allocated_tlab_size);
   if (mem == NULL) {
     assert(allocation._allocated_tlab_size == 0,
            "Allocation failed, but actual size was updated. min: " SIZE_FORMAT
@@ -345,9 +356,9 @@ HeapWord* MemAllocator::allocate_inside_tlab_slow(Allocation& allocation) const 
   return mem;
 }
 
-HeapWord* MemAllocator::mem_allocate(Allocation& allocation) const {
+HeapWord* MemAllocator::mem_allocate(Allocation& allocation,int alloc_gen) const {
   if (UseTLAB) {
-    HeapWord* result = allocate_inside_tlab(allocation);
+    HeapWord* result = allocate_inside_tlab(allocation , alloc_gen);
     if (result != NULL) {
       return result;
     }
@@ -356,11 +367,11 @@ HeapWord* MemAllocator::mem_allocate(Allocation& allocation) const {
   return allocate_outside_tlab(allocation);
 }
 
-oop MemAllocator::allocate() const {
+oop MemAllocator::allocate(int alloc_gen) const {
   oop obj = NULL;
   {
     Allocation allocation(*this, &obj);
-    HeapWord* mem = mem_allocate(allocation);
+    HeapWord* mem = mem_allocate(allocation, alloc_gen);
     if (mem != NULL) {
       obj = initialize(mem);
     } else {

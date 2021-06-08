@@ -69,6 +69,7 @@ private:
   size_t    _allocated_size;
 
   AdaptiveWeightedAverage _allocation_fraction;  // fraction of eden allocated in tlabs
+  Thread* _my_thread;
 
   void reset_statistics();
 
@@ -100,7 +101,6 @@ private:
 
   void print_stats(const char* tag);
 
-  Thread* thread();
 
   // statistics
 
@@ -139,6 +139,8 @@ public:
   static size_t alignment_reserve()              { return align_object_size(end_reserve()); }
   static size_t alignment_reserve_in_bytes()     { return alignment_reserve() * HeapWordSize; }
 
+  Thread* thread();
+  Thread* get_my_thread();
   // Return tlab size or remaining space in eden such that the
   // space is large enough to hold obj_size and necessary fill space.
   // Otherwise return 0;
@@ -170,7 +172,7 @@ public:
 
   void set_back_allocation_end();
   void set_sample_end(bool reset_byte_accumulation);
-
+  void set_my_thread(Thread* my_thread)          { _my_thread = my_thread;  }
   static size_t refill_waste_limit_increment()   { return TLABWasteIncrement; }
 
   template <typename T> void addresses_do(T f) {

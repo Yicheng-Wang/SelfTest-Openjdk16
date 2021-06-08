@@ -127,13 +127,24 @@ uint32_t ZCollectedHeap::hash_oop(oop obj) const {
 
 HeapWord* ZCollectedHeap::allocate_new_tlab(size_t min_size, size_t requested_size, size_t* actual_size) {
   const size_t size_in_bytes = ZUtils::words_to_bytes(align_object_size(requested_size));
-  const uintptr_t addr = _heap.alloc_tlab(size_in_bytes);
+  const uintptr_t addr = _heap.alloc_tlab(size_in_bytes,0);
 
   if (addr != 0) {
     *actual_size = requested_size;
   }
 
   return (HeapWord*)addr;
+}
+
+HeapWord* ZCollectedHeap::allocate_new_tklab(size_t min_size, size_t requested_size, size_t* actual_size) {
+    const size_t size_in_bytes = ZUtils::words_to_bytes(align_object_size(requested_size));
+    const uintptr_t addr = _heap.alloc_tlab(size_in_bytes,1);
+
+    if (addr != 0) {
+        *actual_size = requested_size;
+    }
+
+    return (HeapWord*)addr;
 }
 
 oop ZCollectedHeap::array_allocate(Klass* klass, int size, int length, bool do_zero, TRAPS) {

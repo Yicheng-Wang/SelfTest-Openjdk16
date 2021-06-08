@@ -256,7 +256,7 @@ void ThreadLocalAllocBuffer::startup_initialization() {
   // before the heap is initialized.  So reinitialize it now.
   guarantee(Thread::current()->is_Java_thread(), "tlab initialization thread not Java thread");
   Thread::current()->tlab().initialize();
-
+  Thread::current()->tklab().initialize();
   log_develop_trace(gc, tlab)("TLAB min: " SIZE_FORMAT " initial: " SIZE_FORMAT " max: " SIZE_FORMAT,
                                min_size(), Thread::current()->tlab().initial_desired_size(), max_size());
 }
@@ -327,7 +327,12 @@ void ThreadLocalAllocBuffer::set_sample_end(bool reset_byte_accumulation) {
 }
 
 Thread* ThreadLocalAllocBuffer::thread() {
-  return (Thread*)(((char*)this) + in_bytes(start_offset()) - in_bytes(Thread::tlab_start_offset()));
+    return _my_thread;
+}
+
+Thread* ThreadLocalAllocBuffer::get_my_thread(){
+    //return _my_thread;
+    return (Thread*)(((char*)this) + in_bytes(start_offset()) - in_bytes(Thread::tlab_start_offset()));
 }
 
 void ThreadLocalAllocBuffer::set_back_allocation_end() {

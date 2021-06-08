@@ -70,9 +70,12 @@ void ZThreadLocalAllocBuffer::retire(JavaThread* thread, ThreadLocalAllocStats* 
   if (UseTLAB) {
     stats->reset();
     thread->tlab().addresses_do(fixup_address);
+    thread->tklab().addresses_do(fixup_address);
     thread->tlab().retire(stats);
+    thread->tklab().retire(stats);
     if (ResizeTLAB) {
       thread->tlab().resize();
+      thread->tklab().resize();
     }
   }
 }
@@ -80,6 +83,7 @@ void ZThreadLocalAllocBuffer::retire(JavaThread* thread, ThreadLocalAllocStats* 
 void ZThreadLocalAllocBuffer::remap(JavaThread* thread) {
   if (UseTLAB) {
     thread->tlab().addresses_do(fixup_address);
+    thread->tklab().addresses_do(fixup_address);
   }
 }
 

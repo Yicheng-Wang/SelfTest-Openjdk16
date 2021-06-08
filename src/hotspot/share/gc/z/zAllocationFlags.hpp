@@ -50,7 +50,7 @@ private:
   typedef ZBitField<uint8_t, bool, 0, 1> field_non_blocking;
   typedef ZBitField<uint8_t, bool, 1, 1> field_worker_relocation;
   typedef ZBitField<uint8_t, bool, 2, 1> field_low_address;
-
+  typedef ZBitField<uint8_t, bool, 3, 1> field_Keep_alloc;
   uint8_t _flags;
 
 public:
@@ -67,6 +67,14 @@ public:
 
   void set_low_address() {
     _flags |= field_low_address::encode(true);
+  }
+
+  void set_Keep_alloc() {
+      _flags |= field_Keep_alloc::encode(true);
+  }
+
+  bool Keep_alloc() const {
+      return field_Keep_alloc::decode(_flags);
   }
 
   bool non_blocking() const {

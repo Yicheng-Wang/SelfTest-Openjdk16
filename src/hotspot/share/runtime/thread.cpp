@@ -253,7 +253,8 @@ Thread::Thread() {
   _threads_list_ptr = NULL;
   _nested_threads_hazard_ptr_cnt = 0;
   _rcu_counter = 0;
-
+  _tlab.set_my_thread(this);
+  _tklab.set_my_thread(this);
   // the handle mark links itself to last_handle_mark
   new HandleMark(this);
 
@@ -1995,6 +1996,7 @@ void JavaThread::exit(bool destroy_vm, ExitType exit_type) {
 
   if (UseTLAB) {
     tlab().retire();
+    tklab().retire();
   }
 
   if (JvmtiEnv::environments_might_exist()) {
@@ -2054,6 +2056,7 @@ void JavaThread::cleanup_failed_attach_current_thread(bool is_daemon) {
 
   if (UseTLAB) {
     tlab().retire();
+    tklab().retire();
   }
 
   Threads::remove(this, is_daemon);
