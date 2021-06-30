@@ -229,4 +229,5 @@ void ZObjectAllocator::retire_pages() {
   // Reset allocation pages
   _shared_medium_page.set(NULL);
   _shared_small_page.set_all(NULL);
+  _shared_medium_keep_page.set(NULL);
 }
