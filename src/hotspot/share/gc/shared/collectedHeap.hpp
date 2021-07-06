@@ -286,7 +286,7 @@ class CollectedHeap : public CHeapObj<mtInternal> {
   GCCause::Cause gc_cause() { return _gc_cause; }
 
   oop obj_allocate(Klass* klass, int alloc_gen, int size, TRAPS);
-  virtual oop array_allocate(Klass* klass, int size, int length, bool do_zero, TRAPS);
+  virtual oop array_allocate(Klass* klass, int alloc_gen, int size, int length, bool do_zero, TRAPS);
   oop class_allocate(Klass* klass, int size, TRAPS);
 
   // Utilities for turning raw memory into filler objects.

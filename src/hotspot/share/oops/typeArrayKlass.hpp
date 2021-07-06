@@ -63,8 +63,8 @@ class TypeArrayKlass : public ArrayKlass {
   int oop_size(oop obj) const;
 
   // Allocation
-  typeArrayOop allocate_common(int length, bool do_zero, TRAPS);
-  typeArrayOop allocate(int length, TRAPS) { return allocate_common(length, true, THREAD); }
+  typeArrayOop allocate_common(int alloc_gen, int length, bool do_zero, TRAPS);
+  typeArrayOop allocate(int alloc_gen, int length, TRAPS) { return allocate_common(alloc_gen, length, true, THREAD); }
   oop multi_allocate(int rank, jint* sizes, TRAPS);
 
   oop protection_domain() const { return NULL; }

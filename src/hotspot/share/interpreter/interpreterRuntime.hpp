@@ -158,6 +158,8 @@ class InterpreterRuntime: AllStatic {
   static void    verify_mdp(Method* method, address bcp, address mdp);
 #endif // ASSERT
   static MethodCounters* build_method_counters(JavaThread* thread, Method* m);
+
+  static int get_alloc_gen(ConstantPool *pool, JavaThread *thread, int n_dims);
 };
 
 

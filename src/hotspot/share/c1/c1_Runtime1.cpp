@@ -22,6 +22,7 @@
  *
  */
 
+#include <interpreter/interpreterRuntime.hpp>
 #include "precompiled.hpp"
 #include "asm/codeBuffer.hpp"
 #include "c1/c1_CodeStubs.hpp"
@@ -377,7 +378,10 @@ JRT_ENTRY(void, Runtime1::new_type_array(JavaThread* thread, Klass* klass, jint 
   //       (This may have to change if this code changes!)
   assert(klass->is_klass(), "not a class");
   BasicType elt_type = TypeArrayKlass::cast(klass)->element_type();
-  oop obj = oopFactory::new_typeArray(elt_type, length, CHECK);
+  /*frame last =  thread->last_frame();
+  ConstantPool* constants = last.interpreter_frame_method()->constants();
+  int alloc_gen = InterpreterRuntime::get_alloc_gen(constants, thread,1);*/
+  oop obj = oopFactory::new_typeArray(0, elt_type, length, CHECK);
   thread->set_vm_result(obj);
   // This is pretty rare but this runtime patch is stressful to deoptimization
   // if we deoptimize here so force a deopt to stress the path.

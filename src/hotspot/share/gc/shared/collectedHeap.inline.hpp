@@ -35,9 +35,9 @@ inline oop CollectedHeap::obj_allocate(Klass* klass, int alloc_gen, int size, TR
   return allocator.allocate(alloc_gen);
 }
 
-inline oop CollectedHeap::array_allocate(Klass* klass, int size, int length, bool do_zero, TRAPS) {
+inline oop CollectedHeap::array_allocate(Klass* klass, int alloc_gen, int size, int length, bool do_zero, TRAPS) {
   ObjArrayAllocator allocator(klass, size, length, do_zero, THREAD);
-  return allocator.allocate();
+  return allocator.allocate(alloc_gen);
 }
 
 inline oop CollectedHeap::class_allocate(Klass* klass, int size, TRAPS) {

@@ -49,7 +49,7 @@ class oopFactory: AllStatic {
 
   static typeArrayOop    new_charArray(const char* utf8_str,  TRAPS);
 
-  static typeArrayOop    new_typeArray(BasicType type, int length, TRAPS);
+  static typeArrayOop    new_typeArray(int alloc_gen, BasicType type, int length, TRAPS);
   static typeArrayOop    new_typeArray_nozero(BasicType type, int length, TRAPS);
   static typeArrayOop    new_symbolArray(int length, TRAPS);
 

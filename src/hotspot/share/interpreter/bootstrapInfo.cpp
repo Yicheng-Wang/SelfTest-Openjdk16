@@ -197,7 +197,7 @@ void BootstrapInfo::resolve_args(TRAPS) {
     }
   } else {
     // return {arg_count, pool_index}; JDK code must pull the arguments as needed
-    typeArrayOop ints_oop = oopFactory::new_typeArray(T_INT, 2, CHECK);
+    typeArrayOop ints_oop = oopFactory::new_typeArray(0, T_INT, 2, CHECK);
     ints_oop->int_at_put(0, _argc);
     ints_oop->int_at_put(1, _bss_index);
     _arg_values = Handle(THREAD, ints_oop);

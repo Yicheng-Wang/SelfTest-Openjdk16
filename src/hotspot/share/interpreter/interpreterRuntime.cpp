@@ -214,7 +214,7 @@ JRT_END
 //------------------------------------------------------------------------------------------------------------------------
 // Allocation
 
-int get_alloc_gen(ConstantPool* pool, JavaThread* thread, int n_dims = 0) {
+int InterpreterRuntime::get_alloc_gen(ConstantPool* pool, JavaThread* thread, int n_dims = 0) {
     int alloc_gen = 0;
     int next_centry = 0;
     LastFrameAccessor last_frame(thread);
@@ -320,7 +320,13 @@ JRT_END
 
 
 JRT_ENTRY(void, InterpreterRuntime::newarray(JavaThread* thread, BasicType type, jint size))
-  oop obj = oopFactory::new_typeArray(type, size, CHECK);
+  LastFrameAccessor last_frame(thread);
+  ConstantPool* constants = last_frame.method()->constants();
+  int alloc_gen = get_alloc_gen(constants, thread,1);
+  if(alloc_gen>0){
+      int alloc_gen_test = alloc_gen;
+  }
+  oop obj = oopFactory::new_typeArray(alloc_gen, type, size, CHECK);
   thread->set_vm_result(obj);
 JRT_END
 

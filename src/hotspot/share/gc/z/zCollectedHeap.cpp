@@ -147,9 +147,9 @@ HeapWord* ZCollectedHeap::allocate_new_tklab(size_t min_size, size_t requested_s
     return (HeapWord*)addr;
 }
 
-oop ZCollectedHeap::array_allocate(Klass* klass, int size, int length, bool do_zero, TRAPS) {
+oop ZCollectedHeap::array_allocate(Klass* klass, int alloc_gen, int size, int length, bool do_zero, TRAPS) {
   if (!do_zero) {
-    return CollectedHeap::array_allocate(klass, size, length, false /* do_zero */, THREAD);
+    return CollectedHeap::array_allocate(klass, alloc_gen, size, length, false /* do_zero */, THREAD);
   }
 
   ZObjArrayAllocator allocator(klass, size, length, THREAD);

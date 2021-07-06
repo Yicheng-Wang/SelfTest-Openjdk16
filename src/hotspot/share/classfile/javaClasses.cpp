@@ -912,7 +912,7 @@ void java_lang_Class::initialize_mirror_fields(Klass* k,
   // Allocate a simple java object for a lock.
   // This needs to be a java object because during class initialization
   // it can be held across a java call.
-  typeArrayOop r = oopFactory::new_typeArray(T_INT, 0, CHECK);
+  typeArrayOop r = oopFactory::new_typeArray(0, T_INT, 0, CHECK);
   set_init_lock(mirror(), r);
 
   // Set protection domain also
@@ -1332,7 +1332,7 @@ bool java_lang_Class::restore_archived_mirror(Klass *k,
     // - local static final fields with initial values were initialized at dump time
 
     // create the init_lock
-    typeArrayOop r = oopFactory::new_typeArray(T_INT, 0, CHECK_(false));
+    typeArrayOop r = oopFactory::new_typeArray(0, T_INT, 0, CHECK_(false));
     set_init_lock(mirror(), r);
 
     if (protection_domain.not_null()) {

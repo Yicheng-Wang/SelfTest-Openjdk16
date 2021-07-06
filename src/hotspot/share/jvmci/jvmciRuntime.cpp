@@ -21,6 +21,7 @@
  * questions.
  */
 
+#include <interpreter/interpreterRuntime.hpp>
 #include "precompiled.hpp"
 #include "classfile/javaClasses.inline.hpp"
 #include "classfile/symbolTable.hpp"
@@ -154,7 +155,10 @@ JRT_BLOCK_ENTRY(void, JVMCIRuntime::new_array_common(JavaThread* thread, Klass* 
   if (array_klass->is_typeArray_klass()) {
     BasicType elt_type = TypeArrayKlass::cast(array_klass)->element_type();
     RetryableAllocationMark ram(thread, null_on_fail);
-    obj = oopFactory::new_typeArray(elt_type, length, CHECK);
+    frame last =  thread->last_frame();
+    ConstantPool* constants = last.interpreter_frame_method()->constants();
+    int alloc_gen = InterpreterRuntime::get_alloc_gen(constants, thread,1);
+    obj = oopFactory::new_typeArray(alloc_gen, elt_type, length, CHECK);
   } else {
     Handle holder(THREAD, array_klass->klass_holder()); // keep the klass alive
     Klass* elem_klass = ObjArrayKlass::cast(array_klass)->element_klass();

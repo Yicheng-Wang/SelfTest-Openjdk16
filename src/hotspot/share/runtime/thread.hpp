@@ -827,6 +827,11 @@ protected:
   static ByteSize tlab_start_offset()            { return byte_offset_of(Thread, _tlab) + ThreadLocalAllocBuffer::start_offset(); }
   static ByteSize tlab_end_offset()              { return byte_offset_of(Thread, _tlab) + ThreadLocalAllocBuffer::end_offset(); }
   static ByteSize tlab_top_offset()              { return byte_offset_of(Thread, _tlab) + ThreadLocalAllocBuffer::top_offset(); }
+
+  static ByteSize tklab_start_offset()            { return byte_offset_of(Thread, _tklab) + ThreadLocalAllocBuffer::start_offset(); }
+  static ByteSize tklab_end_offset()              { return byte_offset_of(Thread, _tklab) + ThreadLocalAllocBuffer::end_offset(); }
+  static ByteSize tklab_top_offset()              { return byte_offset_of(Thread, _tklab) + ThreadLocalAllocBuffer::top_offset(); }
+
   static ByteSize tlab_pf_top_offset()           { return byte_offset_of(Thread, _tlab) + ThreadLocalAllocBuffer::pf_top_offset(); }
 
   static ByteSize allocated_bytes_offset()       { return byte_offset_of(Thread, _allocated_bytes); }

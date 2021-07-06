@@ -3466,7 +3466,15 @@ void MacroAssembler::tlab_allocate(Register thread, Register obj,
   BarrierSetAssembler* bs = BarrierSet::barrier_set()->barrier_set_assembler();
   bs->tlab_allocate(this, thread, obj, var_size_in_bytes, con_size_in_bytes, t1, t2, slow_case);
 }
-
+void MacroAssembler::tklab_allocate(Register thread, Register obj,
+                                   Register var_size_in_bytes,
+                                   int con_size_in_bytes,
+                                   Register t1,
+                                   Register t2,
+                                   Label& slow_case) {
+    BarrierSetAssembler* bs = BarrierSet::barrier_set()->barrier_set_assembler();
+    bs->tklab_allocate(this, thread, obj, var_size_in_bytes, con_size_in_bytes, t1, t2, slow_case);
+}
 // Defines obj, preserves var_size_in_bytes
 void MacroAssembler::eden_allocate(Register thread, Register obj,
                                    Register var_size_in_bytes,

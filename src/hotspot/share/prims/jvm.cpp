@@ -732,7 +732,7 @@ JVM_ENTRY(jobject, JVM_Clone(JNIEnv* env, jobject handle))
   oop new_obj_oop = NULL;
   if (obj->is_array()) {
     const int length = ((arrayOop)obj())->length();
-    new_obj_oop = Universe::heap()->array_allocate(klass, size, length,
+    new_obj_oop = Universe::heap()->array_allocate(klass, 0, size, length,
                                                    /* do_zero */ true, CHECK_NULL);
   } else {
     new_obj_oop = Universe::heap()->obj_allocate(klass,0, size, CHECK_NULL);

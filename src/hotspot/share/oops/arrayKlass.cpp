@@ -129,7 +129,7 @@ objArrayOop ArrayKlass::allocate_arrayArray(int n, int length, TRAPS) {
   int size = objArrayOopDesc::object_size(length);
   Klass* k = array_klass(n+dimension(), CHECK_NULL);
   ArrayKlass* ak = ArrayKlass::cast(k);
-  objArrayOop o = (objArrayOop)Universe::heap()->array_allocate(ak, size, length,
+  objArrayOop o = (objArrayOop)Universe::heap()->array_allocate(ak, 0, size, length,
                                                                 /* do_zero */ true, CHECK_NULL);
   // initialization to NULL not necessary, area already cleared
   return o;

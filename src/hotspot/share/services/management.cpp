@@ -1220,7 +1220,7 @@ JVM_ENTRY(jobjectArray, jmm_DumpThreads(JNIEnv *env, jlongArray thread_ids, jboo
       objArrayHandle mh(THREAD, array);
       monitors_array = mh;
 
-      typeArrayOop tarray = oopFactory::new_typeArray(T_INT, num_locked_monitors, CHECK_NULL);
+      typeArrayOop tarray = oopFactory::new_typeArray(0, T_INT, num_locked_monitors, CHECK_NULL);
       typeArrayHandle dh(THREAD, tarray);
       depths_array = dh;
 

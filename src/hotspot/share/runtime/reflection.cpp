@@ -341,7 +341,7 @@ arrayOop Reflection::reflect_new_array(oop element_mirror, jint length, TRAPS) {
   }
   if (java_lang_Class::is_primitive(element_mirror)) {
     Klass* tak = basic_type_mirror_to_arrayklass(element_mirror, CHECK_NULL);
-    return TypeArrayKlass::cast(tak)->allocate(length, THREAD);
+    return TypeArrayKlass::cast(tak)->allocate(0, length, THREAD);
   } else {
     Klass* k = java_lang_Class::as_Klass(element_mirror);
     if (k->is_array_klass() && ArrayKlass::cast(k)->dimension() >= MAX_DIM) {

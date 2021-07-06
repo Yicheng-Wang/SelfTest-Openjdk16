@@ -1843,6 +1843,9 @@ public:
 #endif // _LP64
 
   void vallones(XMMRegister dst, int vector_len);
+
+  void tklab_allocate(Register thread, Register obj, Register var_size_in_bytes, int con_size_in_bytes, Register t1,
+                        Register t2, Label &slow_case);
 };
 
 /**
