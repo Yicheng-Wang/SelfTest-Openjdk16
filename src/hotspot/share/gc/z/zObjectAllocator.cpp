@@ -45,14 +45,22 @@ ZObjectAllocator::ZObjectAllocator() :
     _undone(0),
     _shared_medium_page(NULL),
     _shared_medium_keep_page(NULL),
+    _shared_small_keep_page(NULL),
     _shared_small_page(NULL) {}
 
 ZPage** ZObjectAllocator::shared_small_page_addr() {
   return _use_per_cpu_shared_small_pages ? _shared_small_page.addr() : _shared_small_page.addr(0);
 }
+ZPage** ZObjectAllocator::shared_small_keep_page_addr() {
+    return _use_per_cpu_shared_small_pages ? _shared_small_keep_page.addr() : _shared_small_keep_page.addr(0);
+}
 
 ZPage* const* ZObjectAllocator::shared_small_page_addr() const {
   return _use_per_cpu_shared_small_pages ? _shared_small_page.addr() : _shared_small_page.addr(0);
+}
+
+ZPage* const* ZObjectAllocator::shared_small_keep_page_addr() const {
+    return _use_per_cpu_shared_small_pages ? _shared_small_keep_page.addr() : _shared_small_keep_page.addr(0);
 }
 
 ZPage* ZObjectAllocator::alloc_page(uint8_t type, size_t size, ZAllocationFlags flags) {
@@ -147,15 +155,24 @@ uintptr_t ZObjectAllocator::alloc_medium_keep_object(size_t size, ZAllocationFla
     return alloc_object_in_shared_page(_shared_medium_keep_page.addr(), ZPageTypeMedium, ZPageSizeMedium, size, flags);
 }
 
+uintptr_t ZObjectAllocator::alloc_small_keep_object(size_t size, ZAllocationFlags flags) {
+    return alloc_object_in_shared_page(shared_small_keep_page_addr(), ZPageTypeSmall, ZPageSizeSmall, size, flags);
+}
+
 uintptr_t ZObjectAllocator::alloc_object(size_t size, ZAllocationFlags flags) {
-  if(flags.Keep_alloc()){
-     return alloc_medium_keep_object(size,flags);
-  }
   if (size <= ZObjectSizeLimitSmall) {
     // Small
+      if(flags.Keep_alloc()){
+          //log_info(gc, heap)("In the Keep region small!");
+          return alloc_small_keep_object(size,flags);
+      }
     return alloc_small_object(size, flags);
   } else if (size <= ZObjectSizeLimitMedium) {
     // Medium
+      if(flags.Keep_alloc()){
+          //log_info(gc, heap)("In the Keep region medium!");
+          return alloc_medium_keep_object(size,flags);
+      }
     return alloc_medium_object(size, flags);
   } else {
     // Large
@@ -230,4 +247,5 @@ void ZObjectAllocator::retire_pages() {
   _shared_medium_page.set(NULL);
   _shared_small_page.set_all(NULL);
   _shared_medium_keep_page.set(NULL);
+  _shared_small_keep_page.set(NULL);
 }

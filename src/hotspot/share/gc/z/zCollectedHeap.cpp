@@ -153,7 +153,7 @@ oop ZCollectedHeap::array_allocate(Klass* klass, int alloc_gen, int size, int le
   }
 
   ZObjArrayAllocator allocator(klass, size, length, THREAD);
-  return allocator.allocate();
+  return allocator.allocate(alloc_gen);
 }
 
 HeapWord* ZCollectedHeap::mem_allocate(size_t size, bool* gc_overhead_limit_was_exceeded) {
