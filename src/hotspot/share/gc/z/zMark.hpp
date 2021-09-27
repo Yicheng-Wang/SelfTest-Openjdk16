@@ -63,8 +63,8 @@ private:
   void follow_array(uintptr_t addr, size_t size, bool finalizable);
   void follow_partial_array(ZMarkStackEntry entry, bool finalizable);
   void follow_array_object(objArrayOop obj, bool finalizable);
-  void follow_object(oop obj, bool finalizable);
-  bool try_mark_object(ZMarkCache* cache, uintptr_t addr, bool finalizable);
+
+    bool try_mark_object(ZMarkCache* cache, uintptr_t addr, bool finalizable);
   void mark_and_follow(ZMarkCache* cache, ZMarkStackEntry entry);
 
   template <typename T> bool drain(ZMarkStripe* stripe,
@@ -111,6 +111,8 @@ public:
 
   void flush_and_free();
   bool flush_and_free(Thread* thread);
+
+    static void follow_object(oop obj, bool finalizable);
 };
 
 #endif // SHARE_GC_Z_ZMARK_HPP

@@ -173,6 +173,8 @@ void ZHeap::out_of_memory() {
 ZPage* ZHeap::alloc_page(uint8_t type, size_t size, ZAllocationFlags flags) {
   ZPage* const page = _page_allocator.alloc_page(type, size, flags);
   if (page != NULL) {
+    if(flags.Keep_alloc())
+        page->set_keep(true);
     // Insert page table entry
     _page_table.insert(page);
   }
@@ -352,7 +354,7 @@ void ZHeap::select_relocation_set() {
   ZRelocationSetSelector selector;
   ZPageTableIterator pt_iter(&_page_table);
   for (ZPage* page; pt_iter.next(&page);) {
-    if (!page->is_relocatable()) {
+    if ((!page->is_relocatable()) || page->is_keep()) {
       // Not relocatable, don't register
       continue;
     }

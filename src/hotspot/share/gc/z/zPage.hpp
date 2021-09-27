@@ -44,6 +44,7 @@ private:
   uint64_t           _last_used;
   ZPhysicalMemory    _physical;
   ZListNode<ZPage>   _node;
+  bool               _keep;
 
   void assert_initialized() const;
 
@@ -62,6 +63,7 @@ public:
   size_t object_alignment_shift() const;
   size_t object_alignment() const;
 
+  void set_keep(bool keep);
   uint8_t type() const;
   uintptr_t start() const;
   uintptr_t end() const;
@@ -112,6 +114,8 @@ public:
   void print() const;
 
   void verify_live(uint32_t live_objects, size_t live_bytes) const;
+
+  bool is_keep();
 };
 
 class ZPageClosure {

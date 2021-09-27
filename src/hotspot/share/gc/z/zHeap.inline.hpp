@@ -60,6 +60,10 @@ inline bool ZHeap::is_object_strongly_live(uintptr_t addr) const {
 template <bool follow, bool finalizable, bool publish>
 inline void ZHeap::mark_object(uintptr_t addr) {
   assert(ZGlobalPhase == ZPhaseMark, "Mark not allowed");
+  if(_page_table.get(addr)->is_keep()){
+      ZMark::follow_object(ZOop::from_address(addr), false);
+      return;
+  }
   _mark.mark_object<follow, finalizable, publish>(addr);
 }
 

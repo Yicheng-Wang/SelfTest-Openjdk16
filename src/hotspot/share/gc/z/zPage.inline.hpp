@@ -148,6 +148,10 @@ inline bool ZPage::is_allocating() const {
   return _seqnum == ZGlobalSeqNum;
 }
 
+inline bool ZPage::is_keep(){
+    return _keep;
+}
+
 inline bool ZPage::is_relocatable() const {
   return _seqnum < ZGlobalSeqNum;
 }
@@ -299,6 +303,10 @@ inline bool ZPage::undo_alloc_object_atomic(uintptr_t addr, size_t size) {
     // Retry
     old_top = prev_top;
   }
+}
+
+inline void ZPage::set_keep(bool keep) {
+    this->_keep = keep;
 }
 
 #endif // SHARE_GC_Z_ZPAGE_INLINE_HPP

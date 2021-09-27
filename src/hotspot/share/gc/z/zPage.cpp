@@ -41,7 +41,8 @@ ZPage::ZPage(uint8_t type, const ZVirtualMemory& vmem, const ZPhysicalMemory& pm
     _livemap(object_max_count()),
     _last_used(0),
     _physical(pmem),
-    _node() {
+    _node(),
+    _keep(false){
   assert_initialized();
 }
 
