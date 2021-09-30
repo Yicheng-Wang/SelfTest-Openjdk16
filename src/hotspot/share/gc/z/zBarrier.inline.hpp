@@ -292,6 +292,8 @@ inline oop ZBarrier::weak_load_barrier_on_oop_field(volatile oop* p) {
 }
 
 inline oop ZBarrier::weak_load_barrier_on_oop_field_preloaded(volatile oop* p, oop o) {
+    if(ZAddress::is_keep(ZOop::to_address(o)))
+        return o;
   return weak_barrier<is_weak_good_or_null_fast_path, weak_load_barrier_on_oop_slow_path>(p, o);
 }
 
@@ -391,6 +393,8 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
     barrier<is_marked_or_null_fast_path, mark_barrier_on_finalizable_oop_slow_path>(p, o);
   } else {
     const uintptr_t addr = ZOop::to_address(o);
+    if(ZAddress::is_keep(addr))
+        return;
     if (ZAddress::is_good(addr)) {
       // Mark through good oop
       mark_barrier_on_oop_slow_path(addr);

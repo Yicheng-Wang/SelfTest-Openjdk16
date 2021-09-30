@@ -233,8 +233,12 @@ inline uintptr_t ZPage::alloc_object(size_t size) {
   }
 
   _top = new_top;
-
-  return ZAddress::good(addr);
+  /*if(this->is_keep()){
+      log_info(gc, heap)("Alloc Keep!");
+      return ZAddress::keep(addr);
+  }
+  else*/
+      return ZAddress::good(addr);
 }
 
 inline uintptr_t ZPage::alloc_object_atomic(size_t size) {
@@ -253,7 +257,12 @@ inline uintptr_t ZPage::alloc_object_atomic(size_t size) {
     const uintptr_t prev_top = Atomic::cmpxchg(&_top, addr, new_top);
     if (prev_top == addr) {
       // Success
-      return ZAddress::good(addr);
+        /*if(this->is_keep()){
+            log_info(gc, heap)("Alloc Keep!");
+            return ZAddress::keep(addr);
+        }
+        else*/
+            return ZAddress::good(addr);
     }
 
     // Retry

@@ -139,7 +139,13 @@ bool ZHeap::is_in(uintptr_t addr) const {
   if (ZAddress::is_in(addr)) {
     const ZPage* const page = _page_table.get(addr);
     if (page != NULL) {
+        bool result = page->is_in(addr);
+        if(!result)
+            log_info(gc, heap)("Not In Page!");
       return page->is_in(addr);
+    }
+    else{
+      log_info(gc, heap)("Why Not!");
     }
   }
 

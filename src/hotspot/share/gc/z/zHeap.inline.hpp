@@ -42,6 +42,10 @@ inline ReferenceDiscoverer* ZHeap::reference_discoverer() {
   return &_reference_processor;
 }
 
+inline bool ZHeap::is_object_in_keep(uintptr_t addr){
+    return _page_table.get(addr)->is_keep();
+}
+
 inline uint32_t ZHeap::hash_oop(uintptr_t addr) const {
   const uintptr_t offset = ZAddress::offset(addr);
   return ZHash::address_to_uint32(offset);
@@ -60,10 +64,9 @@ inline bool ZHeap::is_object_strongly_live(uintptr_t addr) const {
 template <bool follow, bool finalizable, bool publish>
 inline void ZHeap::mark_object(uintptr_t addr) {
   assert(ZGlobalPhase == ZPhaseMark, "Mark not allowed");
-  if(_page_table.get(addr)->is_keep()){
-      ZMark::follow_object(ZOop::from_address(addr), false);
+  /*if(_page_table.get(addr)->is_keep()){
       return;
-  }
+  }*/
   _mark.mark_object<follow, finalizable, publish>(addr);
 }
 
@@ -130,7 +133,19 @@ inline void ZHeap::check_out_of_memory() {
 }
 
 inline bool ZHeap::is_oop(uintptr_t addr) const {
-  return ZAddress::is_good(addr) && is_object_aligned(addr) && is_in(addr);
+    bool good = ZAddress::is_good(addr);
+    bool aligned = is_object_aligned(addr);
+    bool in = is_in(addr);
+    if(!in){
+        log_info(gc, heap)("Not In!");
+    }
+    if(!aligned){
+        log_info(gc, heap)("Not Aligned!");
+    }
+    if(!good){
+        log_info(gc, heap)("Not Good!");
+    }
+  return good && aligned && in;
 }
 
 #endif // SHARE_GC_Z_ZHEAP_INLINE_HPP

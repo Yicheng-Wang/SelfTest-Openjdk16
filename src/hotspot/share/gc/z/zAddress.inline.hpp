@@ -31,15 +31,22 @@
 #include "utilities/powerOfTwo.hpp"
 
 inline bool ZAddress::is_null(uintptr_t value) {
+  bool result = (value == 0);
+  if(result)
+      return result;
   return value == 0;
 }
 
 inline bool ZAddress::is_bad(uintptr_t value) {
-  return value & ZAddressBadMask;
+  return !is_good(value);
 }
 
 inline bool ZAddress::is_good(uintptr_t value) {
-  return !is_bad(value) && !is_null(value);
+  return value & ZAddressGoodMask;
+}
+
+inline bool ZAddress::is_keep(uintptr_t value) {
+    return (value & ZAddressMetadataMarked0) && (value & ZAddressMetadataMarked1);
 }
 
 inline bool ZAddress::is_good_or_null(uintptr_t value) {
@@ -50,8 +57,8 @@ inline bool ZAddress::is_good_or_null(uintptr_t value) {
   // This means that an address without mask bits would pass through
   // the barrier as if it was null. This should be harmless as such
   // addresses should ever be passed through the barrier.
-  const bool result = !is_bad(value);
-  assert((is_good(value) || is_null(value)) == result, "Bad address");
+  const bool result = is_good(value) || is_null(value);
+  //assert((is_good(value) || is_null(value)) == result, "Bad address");
   return result;
 }
 
@@ -87,7 +94,7 @@ inline bool ZAddress::is_remapped(uintptr_t value) {
   return value & ZAddressMetadataRemapped;
 }
 
-inline bool ZAddress::is_in(uintptr_t value) {
+inline bool ZAddress:: is_in(uintptr_t value) {
   // Check that exactly one non-offset bit is set
   if (!is_power_of_2(value & ~ZAddressOffsetMask)) {
     return false;
@@ -103,6 +110,10 @@ inline uintptr_t ZAddress::offset(uintptr_t value) {
 
 inline uintptr_t ZAddress::good(uintptr_t value) {
   return offset(value) | ZAddressGoodMask;
+}
+
+inline uintptr_t ZAddress::keep(uintptr_t value) {
+    return offset(value) | ZAddressKeepMask;
 }
 
 inline uintptr_t ZAddress::good_or_null(uintptr_t value) {

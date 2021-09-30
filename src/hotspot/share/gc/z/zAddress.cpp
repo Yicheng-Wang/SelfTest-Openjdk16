@@ -45,6 +45,7 @@ void ZAddress::initialize() {
   ZAddressMetadataFinalizable = (uintptr_t)1 << (ZAddressMetadataShift + 3);
 
   ZAddressMetadataMarked = ZAddressMetadataMarked0;
+  ZAddressKeepMask = (uintptr_t)3 << (ZAddressMetadataShift + 0);
   set_good_mask(ZAddressMetadataRemapped);
 }
 

@@ -230,7 +230,6 @@ int InterpreterRuntime::get_alloc_gen(ConstantPool* pool, JavaThread* thread, in
         for (; next_centry < aac->length(); next_centry++) {
 
             if (bci == aac->at(next_centry)) {
-
                 return 1;
             }
             // Note: I prefill the array with max_jushort.
@@ -251,9 +250,9 @@ int InterpreterRuntime::get_alloc_gen(ConstantPool* pool, JavaThread* thread, in
         data += 2;
         for (u2 i = 0; i < n_anno; i++) {
 //            // byte target type (should be 68 == 0x44 == NEW)
-//            u1 anno_target = *data;
+            u1 anno_target = *data;
 //            // Get short (location, should be bci)
-//            u2 anno_bci = Bytes::get_Java_u2(data + 1);
+            u2 anno_bci = Bytes::get_Java_u2(data + 1);
             // byte loc data size (should be zero)
             u1 dsize = *(data + 3);
             // Note: after the previous byte comes 'dsize'*2 bytes of location data.
@@ -265,16 +264,16 @@ int InterpreterRuntime::get_alloc_gen(ConstantPool* pool, JavaThread* thread, in
             // Note: If anno_bco == bci, then they both point to the same bc. In this
             // situation there is no need to fix the bci. Only if they differ, we
             // should look into the size of make sure that both bcis are a match.
-//            int anno_bc_len = 0;
-//
-//#if !ASM_ANNOTATIONS
-//            for (int i = 0; i < n_dims; i++) {
-//                anno_bc_len += Bytecodes::length_for(Bytecodes::code_at(method, anno_bci + anno_bc_len));
-//            }
-//#endif
+            int anno_bc_len = 0;
+
+#if !ASM_ANNOTATIONS
+            for (int i = 0; i < n_dims; i++) {
+                anno_bc_len += Bytecodes::length_for(Bytecodes::code_at(method, anno_bci + anno_bc_len));
+            }
+#endif
 
 
-            if (type_name->equals("Ljava/lang/Keep;", 16)) {
+            if (anno_target == 68 && (anno_bci+anno_bc_len) == bci && type_name->equals("Ljava/lang/Keep;", 16)) {
                 aac->at_put(next_centry, bci); // Storing in cache.
                 return 1;
             }
@@ -321,9 +320,6 @@ JRT_ENTRY(void, InterpreterRuntime::newarray(JavaThread* thread, BasicType type,
   LastFrameAccessor last_frame(thread);
   ConstantPool* constants = last_frame.method()->constants();
   int alloc_gen = get_alloc_gen(constants, thread,1);
-  if(alloc_gen>0){
-      int alloc_gen_test = alloc_gen;
-  }
   oop obj = oopFactory::new_typeArray(alloc_gen, type, size, CHECK);
   thread->set_vm_result(obj);
 JRT_END

@@ -41,6 +41,7 @@ public:
   static bool is_null(uintptr_t value);
   static bool is_bad(uintptr_t value);
   static bool is_good(uintptr_t value);
+  static bool is_keep(uintptr_t value);
   static bool is_good_or_null(uintptr_t value);
   static bool is_weak_bad(uintptr_t value);
   static bool is_weak_good(uintptr_t value);
@@ -55,6 +56,7 @@ public:
   static uintptr_t address(uintptr_t value);
   static uintptr_t offset(uintptr_t value);
   static uintptr_t good(uintptr_t value);
+  static uintptr_t keep(uintptr_t value);
   static uintptr_t good_or_null(uintptr_t value);
   static uintptr_t finalizable_good(uintptr_t value);
   static uintptr_t marked(uintptr_t value);

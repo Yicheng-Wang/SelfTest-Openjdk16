@@ -93,6 +93,7 @@ const int         ZObjectAlignmentLarge         = 1 << ZObjectAlignmentLargeShif
 extern uintptr_t  ZAddressGoodMask;
 extern uintptr_t  ZAddressBadMask;
 extern uintptr_t  ZAddressWeakBadMask;
+extern uintptr_t  ZAddressKeepMask;
 
 // The bad mask is 64 bit. Its high order 32 bits contain all possible value combinations
 // that this mask will have. Therefore, the memory where the 32 high order bits are stored,

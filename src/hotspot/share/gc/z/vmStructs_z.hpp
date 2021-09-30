@@ -48,6 +48,7 @@ public:
   uintptr_t* _ZAddressGoodMask;
   uintptr_t* _ZAddressBadMask;
   uintptr_t* _ZAddressWeakBadMask;
+  uintptr_t* _ZAddressKeepMask;
 
   const int* _ZObjectAlignmentSmallShift;
   const int* _ZObjectAlignmentSmall;
@@ -63,6 +64,7 @@ typedef ZAttachedArray<ZForwarding, ZForwardingEntry> ZAttachedArrayForForwardin
   nonstatic_field(ZGlobalsForVMStructs,         _ZAddressGoodMask,    uintptr_t*)                    \
   nonstatic_field(ZGlobalsForVMStructs,         _ZAddressBadMask,     uintptr_t*)                    \
   nonstatic_field(ZGlobalsForVMStructs,         _ZAddressWeakBadMask, uintptr_t*)                    \
+  nonstatic_field(ZGlobalsForVMStructs,         _ZAddressKeepMask,    uintptr_t*)                    \
   nonstatic_field(ZGlobalsForVMStructs,         _ZObjectAlignmentSmallShift, const int*)             \
   nonstatic_field(ZGlobalsForVMStructs,         _ZObjectAlignmentSmall, const int*)                  \
                                                                                                      \
