@@ -96,9 +96,9 @@ inline bool ZAddress::is_remapped(uintptr_t value) {
 
 inline bool ZAddress:: is_in(uintptr_t value) {
   // Check that exactly one non-offset bit is set
-  if (!is_power_of_2(value & ~ZAddressOffsetMask)) {
+  /*if (!is_power_of_2(value & ~ZAddressOffsetMask)) {
     return false;
-  }
+  }*/
 
   // Check that one of the non-finalizable metadata is set
   return value & (ZAddressMetadataMask & ~ZAddressMetadataFinalizable);

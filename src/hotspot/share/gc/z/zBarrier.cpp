@@ -66,8 +66,6 @@ bool ZBarrier::should_mark_through(uintptr_t addr) {
 template <bool follow, bool finalizable, bool publish>
 uintptr_t ZBarrier::mark(uintptr_t addr) {
   uintptr_t good_addr;
-  if(ZHeap::heap()->is_object_in_keep(addr))
-      return ZAddress::keep(addr);
 
   if (ZAddress::is_marked(addr)) {
     // Already marked, but try to mark though anyway
@@ -79,6 +77,9 @@ uintptr_t ZBarrier::mark(uintptr_t addr) {
     // Needs to be both remapped and marked
     good_addr = remap(addr);
   }
+
+  if(ZHeap::heap()->is_object_in_keep(good_addr))
+      return ZAddress::keep(addr);
   // Mark
   if (should_mark_through<finalizable>(addr)) {
     ZHeap::heap()->mark_object<follow, finalizable, publish>(good_addr);

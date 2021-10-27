@@ -62,6 +62,7 @@ public:
   static ZForwarding* alloc(ZForwardingAllocator* allocator, ZPage* page);
 
   uint8_t type() const;
+  bool keep() const;
   uintptr_t start() const;
   size_t size() const;
   size_t object_alignment_shift() const;

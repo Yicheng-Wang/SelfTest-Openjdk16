@@ -42,7 +42,7 @@ inline oop CollectedHeap::array_allocate(Klass* klass, int alloc_gen, int size, 
 
 inline oop CollectedHeap::class_allocate(Klass* klass, int size, TRAPS) {
   ClassAllocator allocator(klass, size, THREAD);
-  return allocator.allocate();
+  return allocator.allocate(0);
 }
 
 #endif // SHARE_GC_SHARED_COLLECTEDHEAP_INLINE_HPP
