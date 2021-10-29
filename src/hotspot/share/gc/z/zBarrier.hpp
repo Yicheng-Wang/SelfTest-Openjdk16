@@ -42,6 +42,11 @@ private:
   static const bool Publish     = true;
   static const bool Overflow    = false;
 
+  static size_t skipbarrier;
+  static size_t non_skipbarrier;
+  static size_t skipweakbarrier;
+  static size_t non_skipweakbarrier;
+
   template <ZBarrierFastPath fast_path> static void self_heal(volatile oop* p, uintptr_t addr, uintptr_t heal_addr);
 
   template <ZBarrierFastPath fast_path, ZBarrierSlowPath slow_path> static oop barrier(volatile oop* p, oop o);
@@ -121,6 +126,11 @@ public:
   static oop  weak_load_barrier_on_oop_field_preloaded(volatile narrowOop* p, oop o);
   static oop  weak_load_barrier_on_weak_oop_field_preloaded(volatile narrowOop* p, oop o);
   static oop  weak_load_barrier_on_phantom_oop_field_preloaded(volatile narrowOop* p, oop o);
+
+//    static size_t skipbarrier;
+//    static size_t non_skipbarrier;
+//    static size_t skipweakbarrier;
+//    static size_t non_skipweakbarrier;
 };
 
 class ZLoadBarrierOopClosure : public BasicOopIterateClosure {

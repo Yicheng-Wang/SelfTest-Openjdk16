@@ -65,6 +65,10 @@ inline uint8_t ZForwarding::type() const {
   return _page->type();
 }
 
+inline bool ZForwarding::keep() const {
+    return _page->is_keep();
+}
+
 inline uintptr_t ZForwarding::start() const {
   return _virtual.start();
 }

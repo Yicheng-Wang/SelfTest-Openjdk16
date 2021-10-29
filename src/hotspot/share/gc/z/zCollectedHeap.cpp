@@ -52,7 +52,9 @@ ZCollectedHeap::ZCollectedHeap() :
     _director(new ZDirector()),
     _driver(new ZDriver()),
     _stat(new ZStat()),
-    _runtime_workers() {}
+    _runtime_workers(),
+    _KeepCount(0),
+    _tklabCount(0){}
 
 CollectedHeap::Name ZCollectedHeap::kind() const {
   return CollectedHeap::Z;
@@ -139,7 +141,10 @@ HeapWord* ZCollectedHeap::allocate_new_tlab(size_t min_size, size_t requested_si
 HeapWord* ZCollectedHeap::allocate_new_tklab(size_t min_size, size_t requested_size, size_t* actual_size) {
     const size_t size_in_bytes = ZUtils::words_to_bytes(align_object_size(requested_size));
     const uintptr_t addr = _heap.alloc_tlab(size_in_bytes,1);
-
+    _tklabCount++;
+    if(_tklabCount/(1024)!=(_tklabCount-1)/(1024)){
+        log_info(gc, heap)("Keep TLAB: " SIZE_FORMAT ,_tklabCount);
+    }
     if (addr != 0) {
         *actual_size = requested_size;
     }
@@ -153,6 +158,12 @@ oop ZCollectedHeap::array_allocate(Klass* klass, int alloc_gen, int size, int le
   }
 
   ZObjArrayAllocator allocator(klass, size, length, THREAD);
+  if(alloc_gen>0){
+      _KeepCount ++;
+      if(_KeepCount/(1024*8)!=(_KeepCount-1)/(1024*8)){
+          log_info(gc, heap)("Keep Alloc: " SIZE_FORMAT ,_KeepCount);
+      }
+  }
   return allocator.allocate(alloc_gen);
 }
 

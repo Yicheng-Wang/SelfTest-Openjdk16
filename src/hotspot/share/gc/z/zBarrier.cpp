@@ -30,6 +30,11 @@
 #include "runtime/safepoint.hpp"
 #include "utilities/debug.hpp"
 
+size_t  ZBarrier::skipbarrier = 0;
+size_t  ZBarrier::non_skipbarrier = 0;
+size_t  ZBarrier::skipweakbarrier = 0;
+size_t  ZBarrier::non_skipweakbarrier = 0;
+
 template <bool finalizable>
 bool ZBarrier::should_mark_through(uintptr_t addr) {
   // Finalizable marked oops can still exists on the heap after marking
@@ -79,7 +84,7 @@ uintptr_t ZBarrier::mark(uintptr_t addr) {
   }
 
   if(ZHeap::heap()->is_object_in_keep(good_addr))
-      return ZAddress::keep(addr);
+      return ZAddress::keep(good_addr);
   // Mark
   if (should_mark_through<finalizable>(addr)) {
     ZHeap::heap()->mark_object<follow, finalizable, publish>(good_addr);

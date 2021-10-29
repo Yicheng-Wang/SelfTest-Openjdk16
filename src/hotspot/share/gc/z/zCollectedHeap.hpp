@@ -48,6 +48,8 @@ private:
   ZDriver*          _driver;
   ZStat*            _stat;
   ZRuntimeWorkers   _runtime_workers;
+  size_t             _KeepCount;
+  size_t             _tklabCount;
 
   virtual HeapWord* allocate_new_tlab(size_t min_size,
                                       size_t requested_size,
