@@ -135,6 +135,9 @@ HeapWord* ZCollectedHeap::allocate_new_tlab(size_t min_size, size_t requested_si
     *actual_size = requested_size;
   }
 
+  if(_heap.is_object_in_keep(addr)){
+      log_info(gc, heap)("Why is in Keep page?");
+  }
   return (HeapWord*)addr;
 }
 
@@ -148,7 +151,9 @@ HeapWord* ZCollectedHeap::allocate_new_tklab(size_t min_size, size_t requested_s
     if (addr != 0) {
         *actual_size = requested_size;
     }
-
+    if(!_heap.is_object_in_keep(addr)){
+        log_info(gc, heap)("Why not in Keep page?");
+    }
     return (HeapWord*)addr;
 }
 
@@ -160,10 +165,14 @@ oop ZCollectedHeap::array_allocate(Klass* klass, int alloc_gen, int size, int le
   ZObjArrayAllocator allocator(klass, size, length, THREAD);
   if(alloc_gen>0){
       _KeepCount ++;
-      if(_KeepCount/(1024*8)!=(_KeepCount-1)/(1024*8)){
+      if(_KeepCount/(1024)!=(_KeepCount-1)/(1024)){
           log_info(gc, heap)("Keep Alloc: " SIZE_FORMAT ,_KeepCount);
       }
+      if(!klass->is_typeArray_klass()){
+          log_info(gc, heap)("Not right type: ");
+      }
   }
+  oop result = allocator.allocate(alloc_gen);
   return allocator.allocate(alloc_gen);
 }
 

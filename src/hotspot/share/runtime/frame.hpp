@@ -162,6 +162,8 @@ class frame {
   // NB: receiver must not be first frame
   frame java_sender() const;
 
+  frame interpreter_sender() const;
+
  private:
   // Helper methods for better factored code in frame::sender
   frame sender_for_compiled_frame(RegisterMap* map) const;

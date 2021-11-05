@@ -1196,12 +1196,38 @@ OopMapSet* Runtime1::generate_code_for(StubID id, StubAssembler* sasm) {
         __ enter();
         OopMap* map = save_live_registers(sasm, 3);
         int call_offset;
+//
+//        Label keep_path;
+//        Label end_path;
+//        __ movptr(rsi, Address(rbp, 3*BytesPerWord));
+//        __ cmpptr(Address(rsi, in_bytes(Method::alloc_anno_offset())), (int32_t)NULL_WORD);
+//        __ jcc(Assembler::equal, keep_path);
+//
+//        if (id == new_type_array_id) {
+//            call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_type_keep_array), klass, length);
+//        } else {
+//            call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_object_array), klass, length);
+//        }
+//
+//        __ jmp(end_path);
+//        __ bind(keep_path);
+
+        Register bci = rsi, method = rcx;
+        __ movl(bci, Address(rbp, 2*BytesPerWord));
+        // And a pointer to the Method*
+        __ movptr(method, Address(rbp, 3*BytesPerWord));
+        int alloc_gen = 0;
+
         if (id == new_type_array_id) {
-          call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_type_array), klass, length);
+            if(alloc_gen > 0)
+                call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_type_keep_array), klass, length, method);
+            else
+                call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_type_array), klass, length, method);
         } else {
           call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_object_array), klass, length);
         }
 
+        //__ bind(end_path);
         oop_maps = new OopMapSet();
         oop_maps->add_gc_map(call_offset, map);
         restore_live_registers_except_rax(sasm);

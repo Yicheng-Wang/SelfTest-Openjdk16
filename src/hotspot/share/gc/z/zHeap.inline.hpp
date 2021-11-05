@@ -43,7 +43,11 @@ inline ReferenceDiscoverer* ZHeap::reference_discoverer() {
 }
 
 inline bool ZHeap::is_object_in_keep(uintptr_t addr){
-    return _page_table.get(addr)->is_keep();
+    ZPage* page = _page_table.get(addr);
+    if(page->is_keep())
+        return true;
+    else
+        return false;
 }
 
 inline uint32_t ZHeap::hash_oop(uintptr_t addr) const {

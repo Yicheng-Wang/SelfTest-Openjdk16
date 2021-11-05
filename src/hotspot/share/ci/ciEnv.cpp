@@ -1048,7 +1048,9 @@ void ciEnv::register_method(ciMethod* target,
 
     // Free codeBlobs
     code_buffer->free_blob();
-
+    if(method->alloc_anno_cache() != NULL){
+        log_info(gc, heap)("Compile Keep Method");
+    }
     if (nm != NULL) {
       nm->set_has_unsafe_access(has_unsafe_access);
       nm->set_has_wide_vectors(has_wide_vectors);

@@ -308,6 +308,14 @@ frame frame::java_sender() const {
   return s;
 }
 
+frame frame::interpreter_sender() const {
+    RegisterMap map(JavaThread::current(), false);
+    frame s;
+    for (s = sender(&map); !(s.is_interpreted_frame() || s.is_first_frame()); s = s.sender(&map)) ;
+    guarantee(s.is_java_frame(), "tried to get caller of first java frame");
+    return s;
+}
+
 frame frame::real_sender(RegisterMap* map) const {
   frame result = sender(map);
   while (result.is_runtime_frame() ||

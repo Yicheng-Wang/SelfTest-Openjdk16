@@ -224,12 +224,15 @@ int InterpreterRuntime::get_alloc_gen(ConstantPool* pool, JavaThread* thread, in
 
     AnnotationArray* aa = method->type_annotations();
     Array<u2>* aac = method->alloc_anno_cache();
-
     // First, look into cache.
     if (aac != NULL) {
         for (; next_centry < aac->length(); next_centry++) {
 
             if (bci == aac->at(next_centry)) {
+                // assert(thread != Thread::current(), "sanity");
+                RegisterMap reg_map(thread, false);
+                frame runtime_frame = last_frame.get_frame().sender(&reg_map);
+                Method* last_method = runtime_frame.interpreter_frame_method();
                 return 1;
             }
             // Note: I prefill the array with max_jushort.
@@ -318,8 +321,14 @@ JRT_END
 
 JRT_ENTRY(void, InterpreterRuntime::newarray(JavaThread* thread, BasicType type, jint size))
   LastFrameAccessor last_frame(thread);
-  ConstantPool* constants = last_frame.method()->constants();
+  frame last = thread->last_frame();
+  Method* back_allo_m = last.interpreter_frame_method();
+  Method* allo_m= last_frame.method();
+  ConstantPool* constants = allo_m->constants();
   int alloc_gen = get_alloc_gen(constants, thread,1);
+  if(alloc_gen>0){
+      log_info(gc, heap)("Keep Alloc Start");
+  }
   oop obj = oopFactory::new_typeArray(alloc_gen, type, size, CHECK);
   thread->set_vm_result(obj);
 JRT_END

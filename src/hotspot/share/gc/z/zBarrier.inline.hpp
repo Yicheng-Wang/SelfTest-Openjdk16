@@ -406,7 +406,7 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
     const uintptr_t addr = ZOop::to_address(o);
     if(ZAddress::is_keep(addr)){
         ZBarrier::skipbarrier++;
-        if(ZBarrier::skipbarrier/(1024*32)!=(ZBarrier::skipbarrier-1)/(1024*32)){
+        if(ZBarrier::skipbarrier/(1024*2)!=(ZBarrier::skipbarrier-1)/(1024*2)){
             log_info(gc, heap)("Skip Mark: " SIZE_FORMAT ,ZBarrier::skipbarrier);
         }
         return;

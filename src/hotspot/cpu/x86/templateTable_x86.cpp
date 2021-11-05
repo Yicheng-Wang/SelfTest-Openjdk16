@@ -3996,8 +3996,8 @@ void TemplateTable::_new() {
   Label done;
   Label initialize_header;
   Label initialize_object;  // including clearing the fields
-  Label swith_TLAB;
-  Label end_TLAB;
+//  Label swith_TLAB;
+//  Label end_TLAB;
 
   __ get_cpool_and_tags(rcx, rax);
 
@@ -4048,14 +4048,14 @@ void TemplateTable::_new() {
 #endif // _LP64
 
   if (UseTLAB) {
-    __ get_method(rbx);
-    __ cmpptr(Address(rbx, in_bytes(Method::alloc_anno_offset())), (int32_t)NULL_WORD);
-    __ jcc(Assembler::equal, swith_TLAB);
-    __ tklab_allocate(thread, rax, rdx, 0, rcx, rbx, slow_case);
-    __ jmp(end_TLAB);
-    __ bind(swith_TLAB);
+//    __ get_method(rbx);
+//    __ cmpptr(Address(rbx, in_bytes(Method::alloc_anno_offset())), (int32_t)NULL_WORD);
+//    __ jcc(Assembler::equal, swith_TLAB);
+//    __ tklab_allocate(thread, rax, rdx, 0, rcx, rbx, slow_case);
+//    __ jmp(end_TLAB);
+//    __ bind(swith_TLAB);
     __ tlab_allocate(thread, rax, rdx, 0, rcx, rbx, slow_case);
-    __ bind(end_TLAB);
+//    __ bind(end_TLAB);
     if (ZeroTLAB) {
       // the fields have been already cleared
       __ jmp(initialize_header);
