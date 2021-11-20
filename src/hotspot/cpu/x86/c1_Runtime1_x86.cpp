@@ -1122,6 +1122,7 @@ OopMapSet* Runtime1::generate_code_for(StubID id, StubAssembler* sasm) {
       break;
 
     case new_type_array_id:
+    case new_type_keep_array_id:
     case new_object_array_id:
       {
         Register length   = rbx; // Incoming
@@ -1141,7 +1142,7 @@ OopMapSet* Runtime1::generate_code_for(StubID id, StubAssembler* sasm) {
           Register t0 = obj;
           __ movl(t0, Address(klass, Klass::layout_helper_offset()));
           __ sarl(t0, Klass::_lh_array_tag_shift);
-          int tag = ((id == new_type_array_id)
+          int tag = ((id == new_type_array_id || id == new_type_keep_array_id)
                      ? Klass::_lh_array_tag_type_value
                      : Klass::_lh_array_tag_obj_value);
           __ cmpl(t0, tag);
@@ -1212,18 +1213,11 @@ OopMapSet* Runtime1::generate_code_for(StubID id, StubAssembler* sasm) {
 //        __ jmp(end_path);
 //        __ bind(keep_path);
 
-        Register bci = rsi, method = rcx;
-        __ movl(bci, Address(rbp, 2*BytesPerWord));
-        // And a pointer to the Method*
-        __ movptr(method, Address(rbp, 3*BytesPerWord));
-        int alloc_gen = 0;
-
         if (id == new_type_array_id) {
-            if(alloc_gen > 0)
-                call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_type_keep_array), klass, length, method);
-            else
-                call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_type_array), klass, length, method);
-        } else {
+            call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_type_array), klass, length);
+        }else if(id == new_type_keep_array_id){
+            call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_type_keep_array), klass, length);
+        }else{
           call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_object_array), klass, length);
         }
 
@@ -1635,6 +1629,8 @@ OopMapSet* Runtime1::generate_code_for(StubID id, StubAssembler* sasm) {
         __ should_not_reach_here();
       }
       break;
+      case number_of_ids:
+          break;
   }
   return oop_maps;
 }

@@ -230,9 +230,6 @@ int InterpreterRuntime::get_alloc_gen(ConstantPool* pool, JavaThread* thread, in
 
             if (bci == aac->at(next_centry)) {
                 // assert(thread != Thread::current(), "sanity");
-                RegisterMap reg_map(thread, false);
-                frame runtime_frame = last_frame.get_frame().sender(&reg_map);
-                Method* last_method = runtime_frame.interpreter_frame_method();
                 return 1;
             }
             // Note: I prefill the array with max_jushort.

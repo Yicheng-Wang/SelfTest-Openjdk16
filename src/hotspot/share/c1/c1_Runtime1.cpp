@@ -371,7 +371,7 @@ JRT_ENTRY(void, Runtime1::new_instance(JavaThread* thread, Klass* klass))
 JRT_END
 
 
-JRT_ENTRY(void, Runtime1::new_type_array(JavaThread* thread, Klass* klass, jint length, Method* m))
+JRT_ENTRY(void, Runtime1::new_type_array(JavaThread* thread, Klass* klass, jint length))
   NOT_PRODUCT(_new_type_array_slowcase_cnt++;)
   // Note: no handle for klass needed since they are not used
   //       anymore after new_typeArray() and no GC can happen before.
@@ -387,7 +387,7 @@ JRT_ENTRY(void, Runtime1::new_type_array(JavaThread* thread, Klass* klass, jint 
       ConstantPool* constants = inter_caller_frame.interpreter_frame_method()->constants();
   }
   if(length == 32768) {
-      log_info(gc, heap)("caller_frame: " INTPTR_FORMAT ,caller_frame.cb()->as_nmethod()->method()->print_value_string());
+      log_info(gc, heap)("caller_frame: %s", caller_frame.cb()->as_nmethod()->method()->print_value_string());
   }
   //Array<u2>* aac = m->alloc_anno_cache();
   /*ConstantPool* constants = last.interpreter_frame_method()->constants();

@@ -3465,6 +3465,7 @@ void MacroAssembler::tlab_allocate(Register thread, Register obj,
                                    Label& slow_case) {
   BarrierSetAssembler* bs = BarrierSet::barrier_set()->barrier_set_assembler();
   bs->tlab_allocate(this, thread, obj, var_size_in_bytes, con_size_in_bytes, t1, t2, slow_case);
+  log_info(gc, heap)("TLAB in C1");
 }
 void MacroAssembler::tklab_allocate(Register thread, Register obj,
                                    Register var_size_in_bytes,
@@ -3474,6 +3475,7 @@ void MacroAssembler::tklab_allocate(Register thread, Register obj,
                                    Label& slow_case) {
     BarrierSetAssembler* bs = BarrierSet::barrier_set()->barrier_set_assembler();
     bs->tklab_allocate(this, thread, obj, var_size_in_bytes, con_size_in_bytes, t1, t2, slow_case);
+    log_info(gc, heap)("TKLAB in C1");
 }
 // Defines obj, preserves var_size_in_bytes
 void MacroAssembler::eden_allocate(Register thread, Register obj,
@@ -4015,6 +4017,37 @@ void MacroAssembler::verify_tlab() {
     NOT_LP64(pop(thread_reg));
     pop(t1);
   }
+#endif
+}
+
+void MacroAssembler::verify_tklab() {
+#ifdef ASSERT
+    if (UseTLAB && VerifyOops) {
+        Label next, ok;
+        Register t1 = rsi;
+        Register thread_reg = NOT_LP64(rbx) LP64_ONLY(r15_thread);
+
+        push(t1);
+        NOT_LP64(push(thread_reg));
+        NOT_LP64(get_thread(thread_reg));
+
+        movptr(t1, Address(thread_reg, in_bytes(JavaThread::tklab_top_offset())));
+        cmpptr(t1, Address(thread_reg, in_bytes(JavaThread::tklab_start_offset())));
+        jcc(Assembler::aboveEqual, next);
+        STOP("assert(top >= start)");
+        should_not_reach_here();
+
+        bind(next);
+        movptr(t1, Address(thread_reg, in_bytes(JavaThread::tklab_end_offset())));
+        cmpptr(t1, Address(thread_reg, in_bytes(JavaThread::tklab_top_offset())));
+        jcc(Assembler::aboveEqual, ok);
+        STOP("assert(top <= end)");
+        should_not_reach_here();
+
+        bind(ok);
+        NOT_LP64(pop(thread_reg));
+        pop(t1);
+    }
 #endif
 }
 

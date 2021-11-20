@@ -155,11 +155,11 @@ class OptoRuntime : public AllStatic {
   // =================================
 
   // Allocate storage for a Java instance.
-  static void new_instance_C(Klass* instance_klass, JavaThread *thread);
+  static void new_instance_C(Klass* instance_klass, int alloc_gen, JavaThread *thread);
 
   // Allocate storage for a objArray or typeArray
-  static void new_array_C(Klass* array_klass, int len, JavaThread *thread);
-  static void new_array_nozero_C(Klass* array_klass, int len, JavaThread *thread);
+  static void new_array_C(Klass* array_klass, int alloc_gen, int len, JavaThread *thread);
+  static void new_array_nozero_C(Klass* array_klass, int alloc_gen, int len, JavaThread *thread);
 
   // Allocate storage for a multi-dimensional arrays
   // Note: needs to be fixed for arbitrary number of dimensions

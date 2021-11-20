@@ -211,11 +211,20 @@ void NewInstanceStub::emit_code(LIR_Assembler* ce) {
 
 // Implementation of NewTypeArrayStub
 
-NewTypeArrayStub::NewTypeArrayStub(LIR_Opr klass_reg, LIR_Opr length, LIR_Opr result, CodeEmitInfo* info) {
+NewTypeArrayStub::NewTypeArrayStub(LIR_Opr klass_reg, LIR_Opr length, LIR_Opr result, CodeEmitInfo* info, int alloc_gen) {
   _klass_reg = klass_reg;
   _length = length;
   _result = result;
   _info = new CodeEmitInfo(info);
+  _alloc_gen = alloc_gen;
+}
+
+NewTypeKeepArrayStub::NewTypeKeepArrayStub(LIR_Opr klass_reg, LIR_Opr length, LIR_Opr result, CodeEmitInfo* info, int alloc_gen) {
+    _klass_reg = klass_reg;
+    _length = length;
+    _result = result;
+    _info = new CodeEmitInfo(info);
+    _alloc_gen = alloc_gen;
 }
 
 
@@ -229,6 +238,18 @@ void NewTypeArrayStub::emit_code(LIR_Assembler* ce) {
   ce->verify_oop_map(_info);
   assert(_result->as_register() == rax, "result must in rax,");
   __ jmp(_continuation);
+}
+
+void NewTypeKeepArrayStub::emit_code(LIR_Assembler* ce) {
+    assert(__ rsp_offset() == 0, "frame size should be fixed");
+    __ bind(_entry);
+    assert(_length->as_register() == rbx, "length must in rbx,");
+    assert(_klass_reg->as_register() == rdx, "klass_reg must in rdx");
+    __ call(RuntimeAddress(Runtime1::entry_for(Runtime1::new_type_keep_array_id)));
+    ce->add_call_info_here(_info);
+    ce->verify_oop_map(_info);
+    assert(_result->as_register() == rax, "result must in rax,");
+    __ jmp(_continuation);
 }
 
 

@@ -833,6 +833,7 @@ protected:
   static ByteSize tklab_top_offset()              { return byte_offset_of(Thread, _tklab) + ThreadLocalAllocBuffer::top_offset(); }
 
   static ByteSize tlab_pf_top_offset()           { return byte_offset_of(Thread, _tlab) + ThreadLocalAllocBuffer::pf_top_offset(); }
+  static ByteSize tklab_pf_top_offset()           { return byte_offset_of(Thread, _tklab) + ThreadLocalAllocBuffer::pf_top_offset(); }
 
   static ByteSize allocated_bytes_offset()       { return byte_offset_of(Thread, _allocated_bytes); }
 

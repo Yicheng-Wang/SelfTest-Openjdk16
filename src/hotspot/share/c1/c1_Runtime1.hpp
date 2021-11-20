@@ -49,7 +49,8 @@ class StubAssembler;
   stub(new_instance)                 \
   stub(fast_new_instance)            \
   stub(fast_new_instance_init_check) \
-  stub(new_type_array)               \
+  stub(new_type_array)                   \
+  stub(new_type_keep_array)               \
   stub(new_object_array)             \
   stub(new_multi_array)              \
   stub(handle_exception_nofpu)         /* optimized version that does not preserve fpu registers */ \
@@ -139,7 +140,7 @@ class Runtime1: public AllStatic {
 
   // runtime entry points
   static void new_instance    (JavaThread* thread, Klass* klass);
-  static void new_type_array  (JavaThread* thread, Klass* klass, jint length, Method* m);
+  static void new_type_array  (JavaThread* thread, Klass* klass, jint length);
   static void new_type_keep_array  (JavaThread* thread, Klass* klass, jint length);
   static void new_object_array(JavaThread* thread, Klass* klass, jint length);
   static void new_multi_array (JavaThread* thread, Klass* klass, int rank, jint* dims);

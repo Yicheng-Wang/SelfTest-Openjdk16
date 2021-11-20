@@ -200,6 +200,8 @@ class LIRGenerator: public InstructionVisitor, public BlockClosure {
   void bailout(const char* msg) const            { compilation()->bailout(msg); }
   bool bailed_out() const                        { return compilation()->bailed_out(); }
 
+  static int get_alloc_gen_1(Array<u2>* aac, int bci);
+
   void block_do_prolog(BlockBegin* block);
   void block_do_epilog(BlockBegin* block);
 

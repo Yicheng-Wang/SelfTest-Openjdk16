@@ -172,7 +172,6 @@ oop ZCollectedHeap::array_allocate(Klass* klass, int alloc_gen, int size, int le
           log_info(gc, heap)("Not right type: ");
       }
   }
-  oop result = allocator.allocate(alloc_gen);
   return allocator.allocate(alloc_gen);
 }
 

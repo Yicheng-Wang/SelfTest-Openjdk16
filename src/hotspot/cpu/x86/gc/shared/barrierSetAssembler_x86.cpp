@@ -238,7 +238,7 @@ void BarrierSetAssembler::tklab_allocate(MacroAssembler* masm,
     __ get_thread(thread);
 #endif
     }
-    __ verify_tlab();
+    __ verify_tklab();
 
     __ movptr(obj, Address(thread, JavaThread::tklab_top_offset()));
     if (var_size_in_bytes == noreg) {
@@ -255,7 +255,7 @@ void BarrierSetAssembler::tklab_allocate(MacroAssembler* masm,
     if (var_size_in_bytes == end) {
         __ subptr(var_size_in_bytes, obj);
     }
-    __ verify_tlab();
+    __ verify_tklab();
 
 }
 void BarrierSetAssembler::tlab_allocate(MacroAssembler* masm,

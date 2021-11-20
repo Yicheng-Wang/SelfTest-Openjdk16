@@ -658,6 +658,8 @@ class MacroAssembler: public Assembler {
 
   void verify_tlab();
 
+  void verify_tklab();
+
   // Biased locking support
   // lock_reg and obj_reg must be loaded up with the appropriate values.
   // swap_reg must be rax, and is killed.

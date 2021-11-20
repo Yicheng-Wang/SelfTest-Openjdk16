@@ -195,7 +195,7 @@ const char* OptoRuntime::stub_name(address entry) {
 // and try allocation again.
 
 // object allocation
-JRT_BLOCK_ENTRY(void, OptoRuntime::new_instance_C(Klass* klass, JavaThread* thread))
+JRT_BLOCK_ENTRY(void, OptoRuntime::new_instance_C(Klass* klass, int alloc_gen, JavaThread* thread))
   JRT_BLOCK;
 #ifndef PRODUCT
   SharedRuntime::_new_instance_ctr++;         // new instance requires GC
@@ -215,7 +215,7 @@ JRT_BLOCK_ENTRY(void, OptoRuntime::new_instance_C(Klass* klass, JavaThread* thre
   if (!HAS_PENDING_EXCEPTION) {
     // Scavenge and allocate an instance.
     Handle holder(THREAD, klass->klass_holder()); // keep the klass alive
-    oop result = InstanceKlass::cast(klass)->allocate_instance(THREAD);
+    oop result = InstanceKlass::cast(klass)->allocate_instance(alloc_gen, THREAD);
     thread->set_vm_result(result);
 
     // Pass oops back through thread local storage.  Our apparent type to Java
@@ -233,7 +233,7 @@ JRT_END
 
 
 // array allocation
-JRT_BLOCK_ENTRY(void, OptoRuntime::new_array_C(Klass* array_type, int len, JavaThread *thread))
+JRT_BLOCK_ENTRY(void, OptoRuntime::new_array_C(Klass* array_type, int alloc_gen, int len, JavaThread *thread))
   JRT_BLOCK;
 #ifndef PRODUCT
   SharedRuntime::_new_array_ctr++;            // new array requires GC
@@ -247,7 +247,11 @@ JRT_BLOCK_ENTRY(void, OptoRuntime::new_array_C(Klass* array_type, int len, JavaT
     // The oopFactory likes to work with the element type.
     // (We could bypass the oopFactory, since it doesn't add much value.)
     BasicType elem_type = TypeArrayKlass::cast(array_type)->element_type();
-    result = oopFactory::new_typeArray(0, elem_type, len, THREAD);
+    if(len == 32768) {
+        frame runtime_frame = thread->last_frame();
+        log_info(gc, heap)("Opto alloc:");
+    }
+    result = oopFactory::new_typeArray(alloc_gen, elem_type, len, THREAD);
   } else {
     // Although the oopFactory likes to work with the elem_type,
     // the compiler prefers the array_type, since it must already have
@@ -270,7 +274,7 @@ JRT_BLOCK_ENTRY(void, OptoRuntime::new_array_C(Klass* array_type, int len, JavaT
 JRT_END
 
 // array allocation without zeroing
-JRT_BLOCK_ENTRY(void, OptoRuntime::new_array_nozero_C(Klass* array_type, int len, JavaThread *thread))
+JRT_BLOCK_ENTRY(void, OptoRuntime::new_array_nozero_C(Klass* array_type, int alloc_gen, int len, JavaThread *thread))
   JRT_BLOCK;
 #ifndef PRODUCT
   SharedRuntime::_new_array_ctr++;            // new array requires GC
@@ -448,9 +452,10 @@ JRT_END
 
 const TypeFunc *OptoRuntime::new_instance_Type() {
   // create input type (domain)
-  const Type **fields = TypeTuple::fields(1);
+  const Type **fields = TypeTuple::fields(2);
   fields[TypeFunc::Parms+0] = TypeInstPtr::NOTNULL; // Klass to be allocated
-  const TypeTuple *domain = TypeTuple::make(TypeFunc::Parms+1, fields);
+  fields[TypeFunc::Parms+1] = TypeInt::INT;
+  const TypeTuple *domain = TypeTuple::make(TypeFunc::Parms+2, fields);
 
   // create result type (range)
   fields = TypeTuple::fields(1);
@@ -479,10 +484,11 @@ const TypeFunc *OptoRuntime::athrow_Type() {
 
 const TypeFunc *OptoRuntime::new_array_Type() {
   // create input type (domain)
-  const Type **fields = TypeTuple::fields(2);
+  const Type **fields = TypeTuple::fields(3);
   fields[TypeFunc::Parms+0] = TypeInstPtr::NOTNULL;   // element klass
   fields[TypeFunc::Parms+1] = TypeInt::INT;       // array size
-  const TypeTuple *domain = TypeTuple::make(TypeFunc::Parms+2, fields);
+  fields[TypeFunc::Parms+2] = TypeInt::INT;
+  const TypeTuple *domain = TypeTuple::make(TypeFunc::Parms+3, fields);
 
   // create result type (range)
   fields = TypeTuple::fields(1);

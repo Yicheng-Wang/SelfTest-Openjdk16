@@ -38,7 +38,7 @@
 #include "runtime/stubRoutines.hpp"
 #include "utilities/powerOfTwo.hpp"
 #include "vmreg_x86.inline.hpp"
-
+#include "compiler/compileTask.hpp"
 #ifdef ASSERT
 #define __ gen()->lir(__FILE__, __LINE__)->
 #else
@@ -1277,10 +1277,31 @@ void LIRGenerator::do_NewInstance(NewInstance* x) {
   __ move(reg, result);
 }
 
+int LIRGenerator::get_alloc_gen_1(Array<u2>* aac, int bci) {
+    // First, look into cache.
+    if (aac != NULL) {
+        for (int i = 0; i < aac->length(); i++) {
+            if (bci == aac->at(i)) {
+                return 1;
+            }
+            // Note: I prefill the array with max_jushort.
+            if (aac->at(i) == max_jushort) {
+                // No cache entry at 'i'
+                return 0;
+            }
+        }
+    }
+    return 0;
+}
 
 void LIRGenerator::do_NewTypeArray(NewTypeArray* x) {
   CodeEmitInfo* info = state_for(x, x->state());
-
+  Method* compileMethod = this->compilation()->env()->task()->method();
+  int bci = this->compilation()->current_instruction()->printable_bci();
+  int alloc_gen = get_alloc_gen_1(compileMethod->alloc_anno_cache(),bci);
+  if(alloc_gen>0){
+      int i = 0;
+  }
   LIRItem length(x->length(), this);
   length.load_item_force(FrameMap::rbx_opr);
 
@@ -1294,9 +1315,16 @@ void LIRGenerator::do_NewTypeArray(NewTypeArray* x) {
   BasicType elem_type = x->elt_type();
 
   __ metadata2reg(ciTypeArrayKlass::make(elem_type)->constant_encoding(), klass_reg);
+  CodeStub* slow_path;
 
-  CodeStub* slow_path = new NewTypeArrayStub(klass_reg, len, reg, info);
-  __ allocate_array(reg, len, tmp1, tmp2, tmp3, tmp4, elem_type, klass_reg, slow_path);
+  if(alloc_gen>0){
+      slow_path = new NewTypeKeepArrayStub(klass_reg, len, reg, info, alloc_gen);
+  }
+  else{
+      slow_path = new NewTypeArrayStub(klass_reg, len, reg, info, alloc_gen);
+  }
+
+  __ allocate_array(reg, len, tmp1, tmp2, tmp3, tmp4, elem_type, klass_reg, slow_path, alloc_gen);
 
   LIR_Opr result = rlock_result(x);
   __ move(reg, result);
@@ -1330,7 +1358,7 @@ void LIRGenerator::do_NewObjectArray(NewObjectArray* x) {
     BAILOUT("encountered unloaded_ciobjarrayklass due to out of memory error");
   }
   klass2reg_with_patching(klass_reg, obj, patching_info);
-  __ allocate_array(reg, len, tmp1, tmp2, tmp3, tmp4, T_OBJECT, klass_reg, slow_path);
+  __ allocate_array(reg, len, tmp1, tmp2, tmp3, tmp4, T_OBJECT, klass_reg, slow_path, 0);
 
   LIR_Opr result = rlock_result(x);
   __ move(reg, result);
