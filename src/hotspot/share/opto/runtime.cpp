@@ -247,10 +247,10 @@ JRT_BLOCK_ENTRY(void, OptoRuntime::new_array_C(Klass* array_type, int alloc_gen,
     // The oopFactory likes to work with the element type.
     // (We could bypass the oopFactory, since it doesn't add much value.)
     BasicType elem_type = TypeArrayKlass::cast(array_type)->element_type();
-    if(len == 32768) {
+    /*if(len == 32768) {
         frame runtime_frame = thread->last_frame();
         log_info(gc, heap)("Opto alloc:");
-    }
+    }*/
     result = oopFactory::new_typeArray(alloc_gen, elem_type, len, THREAD);
   } else {
     // Although the oopFactory likes to work with the elem_type,

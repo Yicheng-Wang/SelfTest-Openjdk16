@@ -144,16 +144,16 @@ HeapWord* ZCollectedHeap::allocate_new_tlab(size_t min_size, size_t requested_si
 HeapWord* ZCollectedHeap::allocate_new_tklab(size_t min_size, size_t requested_size, size_t* actual_size) {
     const size_t size_in_bytes = ZUtils::words_to_bytes(align_object_size(requested_size));
     const uintptr_t addr = _heap.alloc_tlab(size_in_bytes,1);
-    _tklabCount++;
+    /*_tklabCount++;
     if(_tklabCount/(1024)!=(_tklabCount-1)/(1024)){
         log_info(gc, heap)("Keep TLAB: " SIZE_FORMAT ,_tklabCount);
-    }
+    }*/
     if (addr != 0) {
         *actual_size = requested_size;
     }
-    if(!_heap.is_object_in_keep(addr)){
+    /*if(!_heap.is_object_in_keep(addr)){
         log_info(gc, heap)("Why not in Keep page?");
-    }
+    }*/
     return (HeapWord*)addr;
 }
 
@@ -163,7 +163,7 @@ oop ZCollectedHeap::array_allocate(Klass* klass, int alloc_gen, int size, int le
   }
 
   ZObjArrayAllocator allocator(klass, size, length, THREAD);
-  if(alloc_gen>0){
+  /*if(alloc_gen>0){
       _KeepCount ++;
       if(_KeepCount/(1024)!=(_KeepCount-1)/(1024)){
           log_info(gc, heap)("Keep Alloc: " SIZE_FORMAT ,_KeepCount);
@@ -171,13 +171,13 @@ oop ZCollectedHeap::array_allocate(Klass* klass, int alloc_gen, int size, int le
       if(!klass->is_typeArray_klass()){
           log_info(gc, heap)("Not right type: ");
       }
-  }
+  }*/
   return allocator.allocate(alloc_gen);
 }
 
 HeapWord* ZCollectedHeap::mem_allocate(size_t size, bool* gc_overhead_limit_was_exceeded) {
   const size_t size_in_bytes = ZUtils::words_to_bytes(align_object_size(size));
-  return (HeapWord*)_heap.alloc_object(size_in_bytes);
+  return (HeapWord*)_heap.alloc_object(size_in_bytes,0);
 }
 
 MetaWord* ZCollectedHeap::satisfy_failed_metadata_allocation(ClassLoaderData* loader_data,

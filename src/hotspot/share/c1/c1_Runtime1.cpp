@@ -378,7 +378,7 @@ JRT_ENTRY(void, Runtime1::new_type_array(JavaThread* thread, Klass* klass, jint 
   //       (This may have to change if this code changes!)
   assert(klass->is_klass(), "not a class");
   BasicType elt_type = TypeArrayKlass::cast(klass)->element_type();
-  assert(thread == Thread::current(), "sanity");
+  /*assert(thread == Thread::current(), "sanity");
   RegisterMap reg_map(thread, false);
   frame runtime_frame = thread->last_frame();
   frame caller_frame = runtime_frame.sender(&reg_map);
@@ -388,7 +388,7 @@ JRT_ENTRY(void, Runtime1::new_type_array(JavaThread* thread, Klass* klass, jint 
   }
   if(length == 32768) {
       log_info(gc, heap)("caller_frame: %s", caller_frame.cb()->as_nmethod()->method()->print_value_string());
-  }
+  }*/
   //Array<u2>* aac = m->alloc_anno_cache();
   /*ConstantPool* constants = last.interpreter_frame_method()->constants();
   int alloc_gen = InterpreterRuntime::get_alloc_gen(constants, thread,1);*/
@@ -413,6 +413,7 @@ JRT_ENTRY(void, Runtime1::new_type_keep_array(JavaThread* thread, Klass* klass, 
     //       (This may have to change if this code changes!)
     assert(klass->is_klass(), "not a class");
     BasicType elt_type = TypeArrayKlass::cast(klass)->element_type();
+    // log_info(gc, heap)("From C1 Keep array");
     oop obj = oopFactory::new_typeArray(1, elt_type, length, CHECK);
     thread->set_vm_result(obj);
     // This is pretty rare but this runtime patch is stressful to deoptimization

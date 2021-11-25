@@ -385,8 +385,8 @@ void ZHeap::select_relocation_set() {
   // Setup forwarding table
   ZRelocationSetIterator rs_iter(&_relocation_set);
   for (ZForwarding* forwarding; rs_iter.next(&forwarding);) {
-      if(forwarding->keep())
-          log_info(gc, heap)("reclaim Keep!!!");
+      /*if(forwarding->keep())
+          log_info(gc, heap)("reclaim Keep!!!");*/
     _forwarding_table.insert(forwarding);
   }
 

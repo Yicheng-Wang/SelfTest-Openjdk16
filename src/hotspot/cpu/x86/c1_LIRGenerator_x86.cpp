@@ -1297,11 +1297,12 @@ int LIRGenerator::get_alloc_gen_1(Array<u2>* aac, int bci) {
 void LIRGenerator::do_NewTypeArray(NewTypeArray* x) {
   CodeEmitInfo* info = state_for(x, x->state());
   Method* compileMethod = this->compilation()->env()->task()->method();
-  int bci = this->compilation()->current_instruction()->printable_bci();
-  int alloc_gen = get_alloc_gen_1(compileMethod->alloc_anno_cache(),bci);
-  if(alloc_gen>0){
+  int visiablebci = x->state()->bci();
+  //int bci = this->compilation()->current_instruction()->printable_bci();
+  int alloc_gen = get_alloc_gen_1(compileMethod->alloc_anno_cache(),visiablebci);
+  /*if(alloc_gen>0){
       int i = 0;
-  }
+  }*/
   LIRItem length(x->length(), this);
   length.load_item_force(FrameMap::rbx_opr);
 

@@ -79,8 +79,8 @@ inline uintptr_t ZHeap::alloc_tlab(size_t size, int alloc_gen) {
   return _object_allocator.alloc_object(size,alloc_gen);
 }
 
-inline uintptr_t ZHeap::alloc_object(size_t size) {
-  uintptr_t addr = _object_allocator.alloc_object(size,0);
+inline uintptr_t ZHeap::alloc_object(size_t size, int alloc_gen) {
+  uintptr_t addr = _object_allocator.alloc_object(size,alloc_gen);
   assert(ZAddress::is_good_or_null(addr), "Bad address");
 
   if (addr == 0) {

@@ -54,7 +54,7 @@ class InterpreterRuntime: AllStatic {
   // Constants
   static void    ldc           (JavaThread* thread, bool wide);
   static void    resolve_ldc   (JavaThread* thread, Bytecodes::Code bytecode);
-
+  static size_t  interkeepalloc;
   // Allocation
   static void    _new          (JavaThread* thread, ConstantPool* pool, int index);
   static void    _get_gen_tlab (JavaThread* thread);                                                                // <underscore>
@@ -159,7 +159,7 @@ class InterpreterRuntime: AllStatic {
 #endif // ASSERT
   static MethodCounters* build_method_counters(JavaThread* thread, Method* m);
 
-  static int get_alloc_gen(ConstantPool *pool, JavaThread *thread, int n_dims);
+  static int get_alloc_gen(JavaThread *thread, int n_dims);
 };
 
 

@@ -3465,7 +3465,7 @@ void MacroAssembler::tlab_allocate(Register thread, Register obj,
                                    Label& slow_case) {
   BarrierSetAssembler* bs = BarrierSet::barrier_set()->barrier_set_assembler();
   bs->tlab_allocate(this, thread, obj, var_size_in_bytes, con_size_in_bytes, t1, t2, slow_case);
-  log_info(gc, heap)("TLAB in C1");
+  //log_info(gc, heap)("TLAB in C1");
 }
 void MacroAssembler::tklab_allocate(Register thread, Register obj,
                                    Register var_size_in_bytes,
@@ -3475,7 +3475,7 @@ void MacroAssembler::tklab_allocate(Register thread, Register obj,
                                    Label& slow_case) {
     BarrierSetAssembler* bs = BarrierSet::barrier_set()->barrier_set_assembler();
     bs->tklab_allocate(this, thread, obj, var_size_in_bytes, con_size_in_bytes, t1, t2, slow_case);
-    log_info(gc, heap)("TKLAB in C1");
+    //log_info(gc, heap)("TKLAB in C1");
 }
 // Defines obj, preserves var_size_in_bytes
 void MacroAssembler::eden_allocate(Register thread, Register obj,

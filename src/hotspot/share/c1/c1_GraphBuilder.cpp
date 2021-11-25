@@ -3948,6 +3948,10 @@ bool GraphBuilder::try_inline_full(ciMethod* callee, bool holder_known, bool ign
   }
 
   BlockBegin* callee_start_block = block_at(0);
+    /*Method*               targetMethod = stream()->method()->get_Method();
+    if(targetMethod->alloc_anno_cache()!=NULL){
+        bool cache = true;
+    }*/
   if (callee_start_block != NULL) {
     assert(callee_start_block->is_set(BlockBegin::parser_loop_header_flag), "must be loop header");
     Goto* goto_callee = new Goto(callee_start_block, false);

@@ -292,7 +292,7 @@ inline oop ZBarrier::weak_load_barrier_on_oop_field(volatile oop* p) {
 }
 
 inline oop ZBarrier::weak_load_barrier_on_oop_field_preloaded(volatile oop* p, oop o) {
-    if(ZAddress::is_keep(ZOop::to_address(o))){
+    /*if(ZAddress::is_keep(ZOop::to_address(o))){
         ZBarrier::skipweakbarrier++;
         if(ZBarrier::skipweakbarrier/(1024)!=(ZBarrier::skipweakbarrier-1)/(1024)){
             log_info(gc, heap)("Skip Weak Mark: " SIZE_FORMAT ,ZBarrier::skipweakbarrier);
@@ -301,10 +301,10 @@ inline oop ZBarrier::weak_load_barrier_on_oop_field_preloaded(volatile oop* p, o
     }
     else{
         ZBarrier::non_skipweakbarrier++;
-        if(ZBarrier::non_skipweakbarrier/(1024*16)!=(ZBarrier::non_skipweakbarrier-1)/(1024*16)){
+        if(ZBarrier::non_skipweakbarrier/(1024*64)!=(ZBarrier::non_skipweakbarrier-1)/(1024*64)){
             log_info(gc, heap)("None Skip Weak Mark: " SIZE_FORMAT ,ZBarrier::non_skipweakbarrier);
         }
-    }
+    }*/
   return weak_barrier<is_weak_good_or_null_fast_path, weak_load_barrier_on_oop_slow_path>(p, o);
 }
 
@@ -405,18 +405,18 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
   } else {
     const uintptr_t addr = ZOop::to_address(o);
     if(ZAddress::is_keep(addr)){
-        ZBarrier::skipbarrier++;
-        if(ZBarrier::skipbarrier/(1024*2)!=(ZBarrier::skipbarrier-1)/(1024*2)){
+        /*ZBarrier::skipbarrier++;
+        if(ZBarrier::skipbarrier/(1024*32)!=(ZBarrier::skipbarrier-1)/(1024*32)){
             log_info(gc, heap)("Skip Mark: " SIZE_FORMAT ,ZBarrier::skipbarrier);
-        }
+        }*/
         return;
     }
-    else{
+    /*else{
         ZBarrier::non_skipbarrier++;
-        if(ZBarrier::non_skipbarrier/(1024*32)!=(ZBarrier::non_skipbarrier-1)/(1024*32)){
+        if(ZBarrier::non_skipbarrier/(1024*64)!=(ZBarrier::non_skipbarrier-1)/(1024*64)){
             log_info(gc, heap)("None Skip Mark: " SIZE_FORMAT ,ZBarrier::non_skipbarrier);
         }
-    }
+    }*/
 
     if (ZAddress::is_good(addr)) {
       // Mark through good oop

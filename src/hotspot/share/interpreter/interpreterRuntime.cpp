@@ -77,6 +77,8 @@
 #include "opto/runtime.hpp"
 #endif
 
+size_t InterpreterRuntime::interkeepalloc = 0;
+
 // Helper class to access current interpreter state
 class LastFrameAccessor : public StackObj {
   frame _last_frame;
@@ -214,13 +216,14 @@ JRT_END
 //------------------------------------------------------------------------------------------------------------------------
 // Allocation
 
-int InterpreterRuntime::get_alloc_gen(ConstantPool* pool, JavaThread* thread, int n_dims = 0) {
+int InterpreterRuntime::get_alloc_gen(JavaThread* thread, int n_dims = 0) {
     int alloc_gen = 0;
     int next_centry = 0;
-    LastFrameAccessor last_frame(thread);
-    Method* method = last_frame.method();
+    frame last = thread->last_frame();
+    Method* method = last.interpreter_frame_method();
+    ConstantPool* pool = method->constants();
     //methodHandle method (thread, last_frame.method());
-    int bci = last_frame.bci();
+    int bci = last.interpreter_frame_bci();
 
     AnnotationArray* aa = method->type_annotations();
     Array<u2>* aac = method->alloc_anno_cache();
@@ -266,11 +269,9 @@ int InterpreterRuntime::get_alloc_gen(ConstantPool* pool, JavaThread* thread, in
             // should look into the size of make sure that both bcis are a match.
             int anno_bc_len = 0;
 
-#if !ASM_ANNOTATIONS
             for (int i = 0; i < n_dims; i++) {
                 anno_bc_len += Bytecodes::length_for(Bytecodes::code_at(method, anno_bci + anno_bc_len));
             }
-#endif
 
 
             if (anno_target == 68 && (anno_bci+anno_bc_len) == bci && type_name->equals("Ljava/lang/Keep;", 16)) {
@@ -309,7 +310,7 @@ JRT_ENTRY(void, InterpreterRuntime::_new(JavaThread* thread, ConstantPool* pool,
   //       Java).
   //       If we have a breakpoint, then we don't rewrite
   //       because the _breakpoint bytecode would be lost.
-  int alloc_gen = get_alloc_gen(pool, thread);
+  int alloc_gen = get_alloc_gen(thread);
   oop obj = klass->allocate_instance(alloc_gen, CHECK);
   //oop obj = klass->allocate_instance(CHECK);
   thread->set_vm_result(obj);
@@ -317,15 +318,13 @@ JRT_END
 
 
 JRT_ENTRY(void, InterpreterRuntime::newarray(JavaThread* thread, BasicType type, jint size))
-  LastFrameAccessor last_frame(thread);
-  frame last = thread->last_frame();
-  Method* back_allo_m = last.interpreter_frame_method();
-  Method* allo_m= last_frame.method();
-  ConstantPool* constants = allo_m->constants();
-  int alloc_gen = get_alloc_gen(constants, thread,1);
-  if(alloc_gen>0){
-      log_info(gc, heap)("Keep Alloc Start");
-  }
+  int alloc_gen = get_alloc_gen(thread,1);
+  /*if(alloc_gen>0){
+      InterpreterRuntime::interkeepalloc++;
+      if(InterpreterRuntime::interkeepalloc/(1024)!=(InterpreterRuntime::interkeepalloc-1)/(1024)){
+          log_info(gc, heap)("Interpreter Keep Alloc" SIZE_FORMAT ,InterpreterRuntime::interkeepalloc);
+      }
+  }*/
   oop obj = oopFactory::new_typeArray(alloc_gen, type, size, CHECK);
   thread->set_vm_result(obj);
 JRT_END
