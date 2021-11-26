@@ -353,7 +353,7 @@ void ZHeap::select_relocation_set() {
   ZRelocationSetSelector selector;
   ZPageTableIterator pt_iter(&_page_table);
   for (ZPage* page; pt_iter.next(&page);) {
-    if ((!page->is_relocatable()) || page->is_keep()) {
+    if ((page->is_keep() || !page->is_relocatable())) {
       // Not relocatable, don't register
       continue;
     }

@@ -162,17 +162,17 @@ uintptr_t ZObjectAllocator::alloc_small_keep_object(size_t size, ZAllocationFlag
 uintptr_t ZObjectAllocator::alloc_object(size_t size, ZAllocationFlags flags) {
   if (size <= ZObjectSizeLimitSmall) {
     // Small
-      if(flags.Keep_alloc()){
+      /*if(flags.Keep_alloc()){
           //log_info(gc, heap)("In the Keep region small!");
           return alloc_small_keep_object(size,flags);
-      }
+      }*/
     return alloc_small_object(size, flags);
   } else if (size <= ZObjectSizeLimitMedium) {
     // Medium
-      if(flags.Keep_alloc()){
+      /*if(flags.Keep_alloc()){
           //log_info(gc, heap)("In the Keep region medium!");
           return alloc_medium_keep_object(size,flags);
-      }
+      }*/
     return alloc_medium_object(size, flags);
   } else {
     // Large
@@ -182,9 +182,15 @@ uintptr_t ZObjectAllocator::alloc_object(size_t size, ZAllocationFlags flags) {
 
 uintptr_t ZObjectAllocator::alloc_object(size_t size,int alloc_gen) {
   ZAllocationFlags flags;
-  if(alloc_gen)
-    flags.set_Keep_alloc();
+  /*if(alloc_gen)
+    flags.set_Keep_alloc();*/
   return alloc_object(size, flags);
+}
+
+uintptr_t ZObjectAllocator::alloc_tklab(size_t size,int alloc_gen) {
+    ZAllocationFlags flags;
+    flags.set_Keep_alloc();
+    return alloc_small_keep_object(size,flags);
 }
 
 uintptr_t ZObjectAllocator::alloc_object_non_blocking(size_t size) {

@@ -67,6 +67,7 @@ public:
   ZObjectAllocator();
 
   uintptr_t alloc_object(size_t size, int alloc_gen);
+  uintptr_t alloc_tklab(size_t size, int alloc_gen);
   uintptr_t alloc_object_non_blocking(size_t size);
   void undo_alloc_object(ZPage* page, uintptr_t addr, size_t size);
 

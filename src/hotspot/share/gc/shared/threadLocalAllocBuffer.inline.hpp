@@ -35,7 +35,8 @@
 inline HeapWord* ThreadLocalAllocBuffer::allocate(size_t size) {
   invariants();
   HeapWord* obj = top();
-  if (pointer_delta(end(), obj) >= size) {
+  size_t left = pointer_delta(end(), obj);
+  if (left >= size) {
     // successful thread-local allocation
 #ifdef ASSERT
     // Skip mangling the space corresponding to the object header to
