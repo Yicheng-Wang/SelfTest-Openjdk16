@@ -22,6 +22,7 @@
  *
  */
 
+#include "gc/z/zUtils.inline.hpp"
 #include "precompiled.hpp"
 #include "classfile/javaClasses.hpp"
 #include "gc/shared/allocTracer.hpp"
@@ -370,7 +371,7 @@ HeapWord* MemAllocator::allocate_inside_tklab_slow(Allocation& allocation, int a
 
     // Discard tlab and allocate a new one.
     // To minimize fragmentation, the last TLAB may be smaller than the rest.
-    size_t new_tlab_size = _word_size * 63 + 72;
+    size_t new_tlab_size = ZUtils::bytes_to_words(ZPageSizeSmall);
 
     tlab.retire_before_allocation();
 

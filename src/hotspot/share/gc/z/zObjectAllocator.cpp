@@ -80,6 +80,20 @@ void ZObjectAllocator::undo_alloc_page(ZPage* page) {
   ZHeap::heap()->undo_alloc_page(page);
 }
 
+uintptr_t ZObjectAllocator::alloc_in_keep_page(uint8_t page_type,
+                                               size_t page_size,
+                                               size_t size,
+                                               ZAllocationFlags flags) {
+    uintptr_t addr = 0;
+
+
+    ZPage* const new_page = alloc_page(page_type, page_size, flags);
+    if (new_page != NULL) {// Allocate object before installing the new page
+        addr = new_page->alloc_object(size);
+    }
+    return addr;
+}
+
 uintptr_t ZObjectAllocator::alloc_object_in_shared_page(ZPage** shared_page,
                                                         uint8_t page_type,
                                                         size_t page_size,
@@ -156,7 +170,7 @@ uintptr_t ZObjectAllocator::alloc_medium_keep_object(size_t size, ZAllocationFla
 }
 
 uintptr_t ZObjectAllocator::alloc_small_keep_object(size_t size, ZAllocationFlags flags) {
-    return alloc_object_in_shared_page(shared_small_keep_page_addr(), ZPageTypeSmall, ZPageSizeSmall, size, flags);
+    return alloc_in_keep_page(ZPageTypeSmall, ZPageSizeSmall, size, flags);
 }
 
 uintptr_t ZObjectAllocator::alloc_object(size_t size, ZAllocationFlags flags) {

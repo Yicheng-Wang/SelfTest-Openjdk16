@@ -56,6 +56,11 @@ private:
                                         size_t size,
                                         ZAllocationFlags flags);
 
+    uintptr_t alloc_in_keep_page(uint8_t page_type,
+                                 size_t page_size,
+                                 size_t size,
+                                 ZAllocationFlags flags);
+
   uintptr_t alloc_large_object(size_t size, ZAllocationFlags flags);
   uintptr_t alloc_medium_object(size_t size, ZAllocationFlags flags);
   uintptr_t alloc_medium_keep_object(size_t size, ZAllocationFlags flags);
