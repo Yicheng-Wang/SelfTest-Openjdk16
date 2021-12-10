@@ -302,6 +302,8 @@ bool ZDriver::pause() {
 }
 
 void ZDriver::pause_mark_start() {
+  if(ShouldKeep)
+    ZDriver::KeepPermit = 1;
   pause<VM_ZMarkStart>();
 }
 

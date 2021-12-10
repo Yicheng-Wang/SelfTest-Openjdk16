@@ -1795,6 +1795,31 @@ public final class System {
     }
 
     /**
+         * Runs the set permit in the Java Virtual Machine.
+         * <p>
+         * Calling the {@code gc} method suggests that the Java Virtual Machine
+         * expend effort toward recycling unused objects in order to
+         * make the memory they currently occupy available for reuse
+         * by the Java Virtual Machine.
+         * When control returns from the method call, the Java Virtual Machine
+         * has made a best effort to reclaim space from all unused objects.
+         * There is no guarantee that this effort will recycle any particular
+         * number of unused objects, reclaim any particular amount of space, or
+         * complete at any particular time, if at all, before the method returns or ever.
+         * <p>
+         * The call {@code System.gc()} is effectively equivalent to the
+         * call:
+         * <blockquote><pre>
+         * Runtime.getRuntime().gc()
+         * </pre></blockquote>
+         *
+         * @see     java.lang.Runtime#gc()
+         */
+    public static void setpermit() {
+        Runtime.getRuntime().setpermit();
+    }
+
+    /**
      * Runs the finalization methods of any objects pending finalization.
      *
      * Calling this method suggests that the Java Virtual Machine expend

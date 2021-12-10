@@ -65,6 +65,12 @@ Java_java_lang_Runtime_gc(JNIEnv *env, jobject this)
     JVM_GC();
 }
 
+JNIEXPORT void JNICALL
+Java_java_lang_Runtime_setpermit(JNIEnv *env, jobject this)
+{
+    JVM_SetKeep();
+}
+
 JNIEXPORT jint JNICALL
 Java_java_lang_Runtime_availableProcessors(JNIEnv *env, jobject this)
 {

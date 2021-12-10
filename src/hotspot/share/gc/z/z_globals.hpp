@@ -51,6 +51,9 @@
   product(bool, ZUncommit, true,                                            \
           "Uncommit unused memory")                                         \
                                                                             \
+  product(bool, ShouldKeep, false,                                          \
+          "Permit Keep")                                         \
+                                                                            \
   product(uintx, ZUncommitDelay, 5 * 60,                                    \
           "Uncommit memory if it has been unused for the specified "        \
           "amount of time (in seconds)")                                    \
