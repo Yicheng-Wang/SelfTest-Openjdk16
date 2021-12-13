@@ -128,6 +128,8 @@ static ZPage* alloc_page(const ZForwarding* forwarding) {
   ZAllocationFlags flags;
   flags.set_non_blocking();
   flags.set_worker_relocation();
+  if(ZDriver::KeepPermit)
+      flags.set_Keep_alloc();
   return ZHeap::heap()->alloc_page(forwarding->type(), forwarding->size(), flags);
 }
 

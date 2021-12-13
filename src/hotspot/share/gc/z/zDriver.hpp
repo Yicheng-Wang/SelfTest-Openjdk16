@@ -60,7 +60,7 @@ public:
   ZDriver();
 
   void collect(GCCause::Cause cause);
-  int static KeepPermit;
+  bool static KeepPermit;
 };
 
 #endif // SHARE_GC_Z_ZDRIVER_HPP

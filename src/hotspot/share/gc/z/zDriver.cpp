@@ -52,6 +52,8 @@ static const ZStatPhaseConcurrent ZPhaseConcurrentRelocated("Concurrent Relocate
 static const ZStatCriticalPhase   ZCriticalPhaseGCLockerStall("GC Locker Stall", false /* verbose */);
 static const ZStatSampler         ZSamplerJavaThreads("System", "Java Threads", ZStatUnitThreads);
 
+bool ZDriver::KeepPermit = false;
+
 class VM_ZOperation : public VM_Operation {
 private:
   const uint _gc_id;
@@ -302,8 +304,6 @@ bool ZDriver::pause() {
 }
 
 void ZDriver::pause_mark_start() {
-  if(ShouldKeep)
-    ZDriver::KeepPermit = 1;
   pause<VM_ZMarkStart>();
 }
 
@@ -402,6 +402,9 @@ public:
 void ZDriver::gc(GCCause::Cause cause) {
   ZDriverGCScope scope(cause);
 
+  if(ShouldKeep)
+      ZDriver::KeepPermit = true;
+
   // Phase 1: Pause Mark Start
   pause_mark_start();
 
@@ -431,6 +434,12 @@ void ZDriver::gc(GCCause::Cause cause) {
 
   // Phase 9: Concurrent Relocate
   concurrent_relocate();
+
+  if(ZDriver::KeepPermit){
+      ShouldKeep = false;
+      ZDriver::KeepPermit = false;
+  }
+
 }
 
 void ZDriver::run_service() {

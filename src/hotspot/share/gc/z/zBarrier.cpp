@@ -29,6 +29,7 @@
 #include "oops/oop.inline.hpp"
 #include "runtime/safepoint.hpp"
 #include "utilities/debug.hpp"
+#include "zDriver.hpp"
 
 size_t  ZBarrier::skipbarrier = 0;
 size_t  ZBarrier::non_skipbarrier = 0;
@@ -83,8 +84,10 @@ uintptr_t ZBarrier::mark(uintptr_t addr) {
     good_addr = remap(addr);
   }
 
-  if(ZHeap::heap()->is_object_in_keep(good_addr))
+  if(ZHeap::heap()->is_object_in_keep(good_addr) && !ZDriver::KeepPermit){
       return ZAddress::keep(good_addr);
+  }
+
   // Mark
   if (should_mark_through<finalizable>(addr)) {
     ZHeap::heap()->mark_object<follow, finalizable, publish>(good_addr);

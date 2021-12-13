@@ -31,6 +31,7 @@
 #include "gc/z/zResurrection.inline.hpp"
 #include "oops/oop.hpp"
 #include "runtime/atomic.hpp"
+#include "zDriver.hpp"
 
 // A self heal must always "upgrade" the address metadata bits in
 // accordance with the metadata bits state machine, which has the
@@ -202,6 +203,10 @@ inline void ZBarrier::root_barrier(oop* p, oop o) {
 
 inline bool ZBarrier::is_good_or_null_fast_path(uintptr_t addr) {
   return ZAddress::is_good_or_null(addr);
+}
+
+inline bool ZBarrier::is_not_keep_fast_path(uintptr_t addr) {
+    return !ZAddress::is_keep(addr);
 }
 
 inline bool ZBarrier::is_weak_good_or_null_fast_path(uintptr_t addr) {
@@ -405,11 +410,14 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
   } else {
     const uintptr_t addr = ZOop::to_address(o);
     if(ZAddress::is_keep(addr)){
+        if(!ZDriver::KeepPermit)
+            return;
+        else
+            barrier<is_not_keep_fast_path, mark_barrier_on_oop_slow_path>(p, o);
         /*ZBarrier::skipbarrier++;
         if(ZBarrier::skipbarrier/(1024*32)!=(ZBarrier::skipbarrier-1)/(1024*32)){
             log_info(gc, heap)("Skip Mark: " SIZE_FORMAT ,ZBarrier::skipbarrier);
         }*/
-        return;
     }
     /*else{
         ZBarrier::non_skipbarrier++;

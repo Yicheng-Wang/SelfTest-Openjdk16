@@ -56,6 +56,7 @@ private:
   static bool is_good_or_null_fast_path(uintptr_t addr);
   static bool is_weak_good_or_null_fast_path(uintptr_t addr);
   static bool is_marked_or_null_fast_path(uintptr_t addr);
+  static bool is_not_keep_fast_path(uintptr_t addr);
 
   static bool during_mark();
   static bool during_relocate();
