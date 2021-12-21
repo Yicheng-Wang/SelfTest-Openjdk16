@@ -205,8 +205,8 @@ void ZBarrierSetAssembler::store_at(MacroAssembler* masm,
       Label done;
       __ testptr(src, address_bad_mask_from_thread(r15_thread));
       __ jcc(Assembler::zero, done);
-      __ stop("Verify oop store failed");
-      __ should_not_reach_here();
+      //__ stop("Verify oop store failed");
+      //__ should_not_reach_here();
       __ bind(done);
     }
   }

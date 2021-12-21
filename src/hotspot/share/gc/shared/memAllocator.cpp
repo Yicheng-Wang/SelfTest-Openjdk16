@@ -379,7 +379,7 @@ HeapWord* MemAllocator::allocate_inside_tklab_slow(Allocation& allocation, int a
     // between minimal and new_tlab_size is accepted.
     size_t min_tlab_size = ThreadLocalAllocBuffer::compute_min_size(_word_size);
     mem = Universe::heap()->allocate_new_tklab(min_tlab_size, new_tlab_size, &allocation._allocated_tlab_size);
-
+    log_info(gc, heap)("Allocation Size" SIZE_FORMAT " , TKLAB refill waste %d", _word_size, tlab.slow_refill_waste());
     if (mem == NULL) {
         assert(allocation._allocated_tlab_size == 0,
                "Allocation failed, but actual size was updated. min: " SIZE_FORMAT

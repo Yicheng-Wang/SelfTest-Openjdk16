@@ -53,7 +53,7 @@ static void z_verify_oop(oop* p) {
   const oop o = RawAccess<>::oop_load(p);
   if (o != NULL) {
     const uintptr_t addr = ZOop::to_address(o);
-    guarantee(ZAddress::is_good(addr), BAD_OOP_ARG(o, p));
+    guarantee(ZAddress::is_good(addr) || ZAddress::is_keep(addr), BAD_OOP_ARG(o, p));
     guarantee(oopDesc::is_oop(ZOop::from_address(addr)), BAD_OOP_ARG(o, p));
   }
 }

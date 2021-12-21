@@ -106,8 +106,8 @@ private:
 
   int number_of_refills() const { return _number_of_refills; }
   int fast_refill_waste() const { return _fast_refill_waste; }
-  int slow_refill_waste() const { return _slow_refill_waste; }
-  int gc_waste() const          { return _gc_waste; }
+
+    int gc_waste() const          { return _gc_waste; }
   int slow_allocations() const  { return _slow_allocations; }
 
 public:
@@ -188,6 +188,8 @@ public:
   static ByteSize end_offset()                   { return byte_offset_of(ThreadLocalAllocBuffer, _end); }
   static ByteSize top_offset()                   { return byte_offset_of(ThreadLocalAllocBuffer, _top); }
   static ByteSize pf_top_offset()                { return byte_offset_of(ThreadLocalAllocBuffer, _pf_top); }
+
+    int slow_refill_waste() const { return _slow_refill_waste; }
 };
 
 class ThreadLocalAllocStats : public StackObj {

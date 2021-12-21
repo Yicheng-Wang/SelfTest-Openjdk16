@@ -238,6 +238,14 @@ inline oop ZBarrier::load_barrier_on_oop_field(volatile oop* p) {
 }
 
 inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o) {
+    if(ZAddress::is_keep(ZOop::to_address(o))){
+        /*ZBarrier::skipbarrier++;
+        if(ZBarrier::skipbarrier/(1024*1024)!=(ZBarrier::skipbarrier-1)/(1024*1024)) {
+            log_info(gc, heap)("Skip Load: " SIZE_FORMAT, ZBarrier::skipbarrier);
+        }*/
+        if(!ZDriver::KeepPermit)
+            return o;
+    }
   return barrier<is_good_or_null_fast_path, load_barrier_on_oop_slow_path>(p, o);
 }
 
@@ -297,16 +305,16 @@ inline oop ZBarrier::weak_load_barrier_on_oop_field(volatile oop* p) {
 }
 
 inline oop ZBarrier::weak_load_barrier_on_oop_field_preloaded(volatile oop* p, oop o) {
-    /*if(ZAddress::is_keep(ZOop::to_address(o))){
-        ZBarrier::skipweakbarrier++;
+    if(ZAddress::is_keep(ZOop::to_address(o))){
+        /*ZBarrier::skipweakbarrier++;
         if(ZBarrier::skipweakbarrier/(1024)!=(ZBarrier::skipweakbarrier-1)/(1024)){
-            log_info(gc, heap)("Skip Weak Mark: " SIZE_FORMAT ,ZBarrier::skipweakbarrier);
-        }
+            log_info(gc, heap)("Skip Weak Load: " SIZE_FORMAT ,ZBarrier::skipweakbarrier);
+        }*/
         return o;
     }
-    else{
+    /*else{
         ZBarrier::non_skipweakbarrier++;
-        if(ZBarrier::non_skipweakbarrier/(1024*64)!=(ZBarrier::non_skipweakbarrier-1)/(1024*64)){
+        if(ZBarrier::non_skipweakbarrier/(1024*256)!=(ZBarrier::non_skipweakbarrier-1)/(1024*256)){
             log_info(gc, heap)("None Skip Weak Mark: " SIZE_FORMAT ,ZBarrier::non_skipweakbarrier);
         }
     }*/
