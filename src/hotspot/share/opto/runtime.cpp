@@ -215,6 +215,9 @@ JRT_BLOCK_ENTRY(void, OptoRuntime::new_instance_C(Klass* klass, int alloc_gen, J
   if (!HAS_PENDING_EXCEPTION) {
     // Scavenge and allocate an instance.
     Handle holder(THREAD, klass->klass_holder()); // keep the klass alive
+    /*if(alloc_gen>0){
+        log_info(gc, heap)("Opto alloc:");
+    }*/
     oop result = InstanceKlass::cast(klass)->allocate_instance(alloc_gen, THREAD);
     thread->set_vm_result(result);
 

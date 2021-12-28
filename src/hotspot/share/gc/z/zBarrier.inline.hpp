@@ -243,8 +243,7 @@ inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o)
         if(ZBarrier::skipbarrier/(1024*1024)!=(ZBarrier::skipbarrier-1)/(1024*1024)) {
             log_info(gc, heap)("Skip Load: " SIZE_FORMAT, ZBarrier::skipbarrier);
         }*/
-        if(!ZDriver::KeepPermit)
-            return o;
+        return o;
     }
   return barrier<is_good_or_null_fast_path, load_barrier_on_oop_slow_path>(p, o);
 }
@@ -400,7 +399,7 @@ inline void ZBarrier::keep_alive_barrier_on_phantom_root_oop_field(oop* p) {
 
 inline void ZBarrier::keep_alive_barrier_on_oop(oop o) {
   const uintptr_t addr = ZOop::to_address(o);
-  assert(ZAddress::is_good(addr), "Invalid address");
+  assert(ZAddress::is_good(addr) || ZAddress::is_keep(addr), "Invalid address");
 
   if (during_mark()) {
     mark_barrier_on_oop_slow_path(addr);

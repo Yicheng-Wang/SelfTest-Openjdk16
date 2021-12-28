@@ -43,7 +43,7 @@ class Array: public MetaspaceObj {
   friend class WhiteBox;
 protected:
   int _length;                                 // the number of array elements
-  T   _data[1];                                // the array memory
+  T   _data[10];                                // the array memory
 
   void initialize(int length) {
     _length = length;

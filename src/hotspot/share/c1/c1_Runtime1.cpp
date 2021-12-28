@@ -370,6 +370,21 @@ JRT_ENTRY(void, Runtime1::new_instance(JavaThread* thread, Klass* klass))
   thread->set_vm_result(obj);
 JRT_END
 
+JRT_ENTRY(void, Runtime1::new_keep_instance(JavaThread* thread, Klass* klass))
+    NOT_PRODUCT(_new_instance_slowcase_cnt++;)
+
+    assert(klass->is_klass(), "not a class");
+    Handle holder(THREAD, klass->klass_holder()); // keep the klass alive
+    InstanceKlass* h = InstanceKlass::cast(klass);
+    log_info(gc, heap)("From C1 Keep object");
+    h->check_valid_for_instantiation(true, CHECK);
+    // make sure klass is initialized
+    h->initialize(CHECK);
+    // allocate instance and return via TLS
+    oop obj = h->allocate_instance(1,CHECK);
+    thread->set_vm_result(obj);
+JRT_END
+
 
 JRT_ENTRY(void, Runtime1::new_type_array(JavaThread* thread, Klass* klass, jint length))
   NOT_PRODUCT(_new_type_array_slowcase_cnt++;)

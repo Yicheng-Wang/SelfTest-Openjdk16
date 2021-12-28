@@ -46,7 +46,8 @@ class StubAssembler;
   stub(throw_div0_exception)         \
   stub(throw_null_pointer_exception) \
   stub(register_finalizer)           \
-  stub(new_instance)                 \
+  stub(new_instance)                     \
+  stub(new_keep_instance)                 \
   stub(fast_new_instance)            \
   stub(fast_new_instance_init_check) \
   stub(new_type_array)                   \
@@ -140,6 +141,7 @@ class Runtime1: public AllStatic {
 
   // runtime entry points
   static void new_instance    (JavaThread* thread, Klass* klass);
+  static void new_keep_instance    (JavaThread* thread, Klass* klass);
   static void new_type_array  (JavaThread* thread, Klass* klass, jint length);
   static void new_type_keep_array  (JavaThread* thread, Klass* klass, jint length);
   static void new_object_array(JavaThread* thread, Klass* klass, jint length);

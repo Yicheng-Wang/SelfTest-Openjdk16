@@ -1823,11 +1823,11 @@ Node* PhaseMacroExpand::prefetch_allocation(Node* i_o, Node*& needgc_false,
       Node *eden_pf_adr;
       if(alloc_gen>0){
            eden_pf_adr = new AddPNode( top()/*not oop*/, thread,
-                                       _igvn.MakeConX(in_bytes(JavaThread::tlab_pf_top_offset())) );
+                                       _igvn.MakeConX(in_bytes(JavaThread::tklab_pf_top_offset())) );
       }
       else{
            eden_pf_adr = new AddPNode( top()/*not oop*/, thread,
-                                       _igvn.MakeConX(in_bytes(JavaThread::tklab_pf_top_offset())) );
+                                       _igvn.MakeConX(in_bytes(JavaThread::tlab_pf_top_offset())) );
        }
       transform_later(eden_pf_adr);
 

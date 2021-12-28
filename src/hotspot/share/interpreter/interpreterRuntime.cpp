@@ -311,6 +311,9 @@ JRT_ENTRY(void, InterpreterRuntime::_new(JavaThread* thread, ConstantPool* pool,
   //       If we have a breakpoint, then we don't rewrite
   //       because the _breakpoint bytecode would be lost.
   int alloc_gen = get_alloc_gen(thread);
+  /*if(alloc_gen>0){
+      log_info(gc, heap)("Interpreter Keep Alloc Object");
+  }*/
   oop obj = klass->allocate_instance(alloc_gen, CHECK);
   //oop obj = klass->allocate_instance(CHECK);
   thread->set_vm_result(obj);
@@ -324,6 +327,9 @@ JRT_ENTRY(void, InterpreterRuntime::newarray(JavaThread* thread, BasicType type,
       if(InterpreterRuntime::interkeepalloc/(1024)!=(InterpreterRuntime::interkeepalloc-1)/(1024)){
           log_info(gc, heap)("Interpreter Keep Alloc" SIZE_FORMAT ,InterpreterRuntime::interkeepalloc);
       }
+  }*/
+  /*if(alloc_gen>0){
+      log_info(gc, heap)("Interpreter Keep Alloc Array ");
   }*/
   oop obj = oopFactory::new_typeArray(alloc_gen, type, size, CHECK);
   thread->set_vm_result(obj);

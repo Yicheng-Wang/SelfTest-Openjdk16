@@ -152,6 +152,10 @@ inline bool ZPage::is_keep(){
     return _keep;
 }
 
+inline bool ZPage::is_direct(){
+    return _direct;
+}
+
 inline bool ZPage::is_relocatable() const {
   return _seqnum < ZGlobalSeqNum;
 }
@@ -316,6 +320,10 @@ inline bool ZPage::undo_alloc_object_atomic(uintptr_t addr, size_t size) {
 
 inline void ZPage::set_keep(bool keep) {
     this->_keep = keep;
+}
+
+inline void ZPage::set_direct(bool direct) {
+    this->_direct = direct;
 }
 
 #endif // SHARE_GC_Z_ZPAGE_INLINE_HPP

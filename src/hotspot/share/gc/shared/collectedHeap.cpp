@@ -187,14 +187,17 @@ bool CollectedHeap::supports_concurrent_gc_breakpoints() const {
 
 bool CollectedHeap::is_oop(oop object) const {
   if (!is_object_aligned(object)) {
+    //log_info(gc, heap)("Not aligned!");
     return false;
   }
 
   if (!is_in(object)) {
+      //log_info(gc, heap)("Not in!");
     return false;
   }
 
   if (is_in(object->klass_or_null())) {
+      //log_info(gc, heap)("Not aligned!");
     return false;
   }
 

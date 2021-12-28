@@ -1020,6 +1020,7 @@ OopMapSet* Runtime1::generate_code_for(StubID id, StubAssembler* sasm) {
     case new_instance_id:
     case fast_new_instance_id:
     case fast_new_instance_init_check_id:
+    case new_keep_instance_id:
       {
         Register klass = rdx; // Incoming
         Register obj   = rax; // Result
@@ -1028,7 +1029,9 @@ OopMapSet* Runtime1::generate_code_for(StubID id, StubAssembler* sasm) {
           __ set_info("new_instance", dont_gc_arguments);
         } else if (id == fast_new_instance_id) {
           __ set_info("fast new_instance", dont_gc_arguments);
-        } else {
+        } else if(id == new_keep_instance_id ){
+            __ set_info("keep new_instance", dont_gc_arguments);
+        }else {
           assert(id == fast_new_instance_init_check_id, "bad StubID");
           __ set_info("fast new_instance init check", dont_gc_arguments);
         }
@@ -1090,7 +1093,11 @@ OopMapSet* Runtime1::generate_code_for(StubID id, StubAssembler* sasm) {
 
         __ enter();
         OopMap* map = save_live_registers(sasm, 2);
-        int call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_instance), klass);
+        int call_offset;
+        if(id==new_keep_instance_id)
+            call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_keep_instance), klass);
+        else
+            call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_instance), klass);
         oop_maps = new OopMapSet();
         oop_maps->add_gc_map(call_offset, map);
         restore_live_registers_except_rax(sasm);

@@ -358,7 +358,7 @@ class ZVerifyBadOopClosure : public OopClosure {
 public:
   virtual void do_oop(oop* p) {
     const oop o = *p;
-    assert(!ZAddress::is_good(ZOop::to_address(o)), "Should not be good: " PTR_FORMAT, p2i(o));
+    assert(!ZAddress::is_good(ZOop::to_address(o)) || ZAddress::is_keep(ZOop::to_address(o)), "Should not be good: " PTR_FORMAT, p2i(o));
   }
 
   virtual void do_oop(narrowOop* p) {

@@ -353,11 +353,15 @@ void ZHeap::select_relocation_set() {
   ZRelocationSetSelector selector;
   ZPageTableIterator pt_iter(&_page_table);
   for (ZPage* page; pt_iter.next(&page);) {
-    if ((page->is_keep() && !ZDriver::KeepPermit) || !page->is_relocatable() || (!page->is_keep() && ZDriver::KeepPermit)){
+    if (((page->is_keep() || page->is_direct()) && !ZDriver::KeepPermit) || !page->is_relocatable()){
       // Not relocatable, don't register
       continue;
     }
-
+    if(ZDriver::KeepPermit){
+        page->set_direct(false);
+        if(!page->is_keep())
+            continue;
+    }
     if (page->is_marked()) {
       // Register live page
       selector.register_live_page(page);

@@ -91,6 +91,7 @@ public:
 
   bool is_in(uintptr_t addr) const;
   bool is_object_in_keep(uintptr_t addr);
+  void setDirect(uintptr_t addr);
   uint32_t hash_oop(uintptr_t addr) const;
 
   // Threads

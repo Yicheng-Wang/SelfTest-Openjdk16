@@ -42,8 +42,8 @@ bool ZBarrier::should_mark_through(uintptr_t addr) {
   // has completed, in which case we just want to convert this into a
   // good oop and not push it on the mark stack.
   if (!during_mark()) {
-    assert(ZAddress::is_marked(addr), "Should be marked");
-    assert(ZAddress::is_finalizable(addr), "Should be finalizable");
+    //assert(ZAddress::is_marked(addr), "Should be marked");
+    //assert(ZAddress::is_finalizable(addr), "Should be finalizable");
     return false;
   }
 
@@ -69,6 +69,33 @@ bool ZBarrier::should_mark_through(uintptr_t addr) {
   return true;
 }
 
+template <bool finalizable>
+class ZMarkDirectClosure : public ClaimMetadataVisitingOopIterateClosure {
+public:
+    ZMarkDirectClosure() :
+            ClaimMetadataVisitingOopIterateClosure(finalizable
+                                                   ? ClassLoaderData::_claim_finalizable
+                                                   : ClassLoaderData::_claim_strong,
+                                                   finalizable
+                                                   ? NULL
+                                                   : ZHeap::heap()->reference_discoverer()) {}
+
+    virtual void do_oop(oop* p) {
+        ZBarrier::set_direct(p, finalizable);
+    }
+
+    virtual void do_oop(narrowOop* p) {
+        ShouldNotReachHere();
+    }
+};
+void ZBarrier::set_direct(oop* p, bool finalizable){
+    uintptr_t addr = ZOop::to_address(Atomic::load(p));
+    if(!ZAddress::is_null(addr)){
+        ZHeap::heap()->setDirect(addr);
+    }
+}
+
+
 template <bool follow, bool finalizable, bool publish>
 uintptr_t ZBarrier::mark(uintptr_t addr) {
   uintptr_t good_addr;
@@ -85,7 +112,10 @@ uintptr_t ZBarrier::mark(uintptr_t addr) {
   }
 
   if(ZHeap::heap()->is_object_in_keep(good_addr) && !ZDriver::KeepPermit){
-      return ZAddress::keep(good_addr);
+      oop target = ZOop::from_address(good_addr);
+      ZMarkDirectClosure<false> cl;
+      target->oop_iterate(&cl);
+      return good_addr;
   }
 
   // Mark

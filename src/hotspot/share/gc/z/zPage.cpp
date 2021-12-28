@@ -42,7 +42,8 @@ ZPage::ZPage(uint8_t type, const ZVirtualMemory& vmem, const ZPhysicalMemory& pm
     _last_used(0),
     _physical(pmem),
     _node(),
-    _keep(false){
+    _keep(false),
+    _direct(false){
   assert_initialized();
 }
 
