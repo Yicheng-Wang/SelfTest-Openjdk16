@@ -115,6 +115,7 @@ uintptr_t ZBarrier::mark(uintptr_t addr) {
       oop target = ZOop::from_address(good_addr);
       ZMarkDirectClosure<false> cl;
       target->oop_iterate(&cl);
+      good_addr = ZAddress::keep(good_addr);
       return good_addr;
   }
 
