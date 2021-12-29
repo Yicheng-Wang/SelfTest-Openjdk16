@@ -322,8 +322,8 @@ inline void ZPage::set_keep(bool keep) {
     this->_keep = keep;
 }
 
-inline void ZPage::set_direct(bool direct) {
+/*inline void ZPage::set_direct(bool direct) {
     this->_direct = direct;
-}
+}*/
 
 #endif // SHARE_GC_Z_ZPAGE_INLINE_HPP

@@ -65,7 +65,7 @@ public:
   size_t object_alignment() const;
 
   void set_keep(bool keep);
-  void set_direct(bool direct);
+  //void set_direct(bool direct);
   uint8_t type() const;
   uintptr_t start() const;
   uintptr_t end() const;

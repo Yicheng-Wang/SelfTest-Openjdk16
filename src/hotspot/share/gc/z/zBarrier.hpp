@@ -83,7 +83,7 @@ private:
 
 public:
   // Load barrier
-  static void set_direct(oop* p, bool finalizable);
+  //static void set_direct(oop* p, bool finalizable);
   static  oop load_barrier_on_oop(oop o);
   static  oop load_barrier_on_oop_field(volatile oop* p);
   static  oop load_barrier_on_oop_field_preloaded(volatile oop* p, oop o);

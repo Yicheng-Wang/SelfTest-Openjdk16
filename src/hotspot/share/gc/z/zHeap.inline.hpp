@@ -50,10 +50,10 @@ inline bool ZHeap::is_object_in_keep(uintptr_t addr){
         return false;
 }
 
-inline void ZHeap::setDirect(uintptr_t addr){
+/*inline void ZHeap::setDirect(uintptr_t addr){
     ZPage* page = _page_table.get(addr);
     page->set_direct(true);
-}
+}*/
 
 inline uint32_t ZHeap::hash_oop(uintptr_t addr) const {
   const uintptr_t offset = ZAddress::offset(addr);

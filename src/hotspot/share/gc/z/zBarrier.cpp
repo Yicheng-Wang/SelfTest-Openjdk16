@@ -23,10 +23,8 @@
 
 #include "precompiled.hpp"
 #include "gc/z/zBarrier.inline.hpp"
-#include "gc/z/zHeap.inline.hpp"
 #include "gc/z/zOop.inline.hpp"
 #include "memory/iterator.inline.hpp"
-#include "oops/oop.inline.hpp"
 #include "runtime/safepoint.hpp"
 #include "utilities/debug.hpp"
 #include "zDriver.hpp"
@@ -69,31 +67,12 @@ bool ZBarrier::should_mark_through(uintptr_t addr) {
   return true;
 }
 
-template <bool finalizable>
-class ZMarkDirectClosure : public ClaimMetadataVisitingOopIterateClosure {
-public:
-    ZMarkDirectClosure() :
-            ClaimMetadataVisitingOopIterateClosure(finalizable
-                                                   ? ClassLoaderData::_claim_finalizable
-                                                   : ClassLoaderData::_claim_strong,
-                                                   finalizable
-                                                   ? NULL
-                                                   : ZHeap::heap()->reference_discoverer()) {}
-
-    virtual void do_oop(oop* p) {
-        ZBarrier::set_direct(p, finalizable);
-    }
-
-    virtual void do_oop(narrowOop* p) {
-        ShouldNotReachHere();
-    }
-};
-void ZBarrier::set_direct(oop* p, bool finalizable){
+/*void ZBarrier::set_direct(oop* p, bool finalizable){
     uintptr_t addr = ZOop::to_address(Atomic::load(p));
     if(!ZAddress::is_null(addr)){
         ZHeap::heap()->setDirect(addr);
     }
-}
+}*/
 
 
 template <bool follow, bool finalizable, bool publish>
@@ -112,10 +91,13 @@ uintptr_t ZBarrier::mark(uintptr_t addr) {
   }
 
   if(ZHeap::heap()->is_object_in_keep(good_addr) && !ZDriver::KeepPermit){
-      oop target = ZOop::from_address(good_addr);
-      ZMarkDirectClosure<false> cl;
-      target->oop_iterate(&cl);
       good_addr = ZAddress::keep(good_addr);
+      oop target = ZOop::from_address(good_addr);
+      Klass* targetklass = target->klass();
+      if(targetklass->is_instance_klass()){
+          ZMarkDirectClosure<finalizable> cl;
+          target->oop_iterate(&cl);
+      }
       return good_addr;
   }
 

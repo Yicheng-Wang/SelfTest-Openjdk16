@@ -692,7 +692,7 @@ void ZPageAllocator::free_page_inner(ZPage* page, bool reclaimed) {
   // Set time when last used
   page->set_last_used();
   page->set_keep(false);
-  page->set_direct(false);
+  //page->set_direct(false);
   // Cache page
   _cache.free_page(page);
 }

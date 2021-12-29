@@ -29,7 +29,8 @@
 #include "gc/z/zBarrier.hpp"
 #include "gc/z/zOop.inline.hpp"
 #include "gc/z/zResurrection.inline.hpp"
-#include "oops/oop.hpp"
+#include "oops/oop.inline.hpp"
+#include "gc/z/zHeap.inline.hpp"
 #include "runtime/atomic.hpp"
 #include "zDriver.hpp"
 
@@ -102,6 +103,26 @@
 //   Load & Load(AS_NO_KEEPALIVE)
 //     Remapped(N)       <- Marked(N)
 //                       <- Finalizable(N)
+
+template <bool finalizable>
+class ZMarkDirectClosure : public ClaimMetadataVisitingOopIterateClosure {
+public:
+    ZMarkDirectClosure() :
+            ClaimMetadataVisitingOopIterateClosure(finalizable
+                                                   ? ClassLoaderData::_claim_finalizable
+                                                   : ClassLoaderData::_claim_strong,
+                                                   finalizable
+                                                   ? NULL
+                                                   : ZHeap::heap()->reference_discoverer()) {}
+
+    virtual void do_oop(oop* p) {
+        ZBarrier::mark_barrier_on_oop_field(p, finalizable);
+    }
+
+    virtual void do_oop(narrowOop* p) {
+        ShouldNotReachHere();
+    }
+};
 
 template <ZBarrierFastPath fast_path>
 inline void ZBarrier::self_heal(volatile oop* p, uintptr_t addr, uintptr_t heal_addr) {
@@ -417,8 +438,13 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
   } else {
     const uintptr_t addr = ZOop::to_address(o);
     if(ZAddress::is_keep(addr)){
-        if(!ZDriver::KeepPermit)
+        if(!ZDriver::KeepPermit){
+            if(o->klass()->is_instance_klass()){
+                ZMarkDirectClosure<Strong> cl;
+                o->oop_iterate(&cl);
+            }
             return;
+        }
         else
             barrier<is_not_keep_fast_path, mark_barrier_on_oop_slow_path>(p, o);
         /*ZBarrier::skipbarrier++;
