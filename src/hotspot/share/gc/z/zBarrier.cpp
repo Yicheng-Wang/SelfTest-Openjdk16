@@ -92,13 +92,6 @@ uintptr_t ZBarrier::mark(uintptr_t addr) {
 
   if(ZHeap::heap()->is_object_in_keep(good_addr) && !ZDriver::KeepPermit){
       good_addr = ZAddress::keep(good_addr);
-      oop target = ZOop::from_address(good_addr);
-      Klass* targetklass = target->klass();
-      if(targetklass->is_instance_klass()){
-          ZMarkDirectClosure<finalizable> cl;
-          target->oop_iterate(&cl);
-      }
-      return good_addr;
   }
 
   // Mark

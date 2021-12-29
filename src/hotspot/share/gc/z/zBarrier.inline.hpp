@@ -439,9 +439,8 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
     const uintptr_t addr = ZOop::to_address(o);
     if(ZAddress::is_keep(addr)){
         if(!ZDriver::KeepPermit){
-            if(o->klass()->is_instance_klass()){
-                ZMarkDirectClosure<Strong> cl;
-                o->oop_iterate(&cl);
+            if(o->is_instance()){
+                ZHeap::heap()->mark_object<true, false, true>(addr);
             }
             return;
         }
