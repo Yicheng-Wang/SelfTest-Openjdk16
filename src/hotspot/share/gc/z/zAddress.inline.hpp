@@ -120,6 +120,10 @@ inline uintptr_t ZAddress::good_or_null(uintptr_t value) {
   return is_null(value) ? 0 : good(value);
 }
 
+inline uintptr_t ZAddress::keep_or_null(uintptr_t value) {
+  return is_null(value) ? 0 : keep(value);
+}
+
 inline uintptr_t ZAddress::finalizable_good(uintptr_t value) {
   return offset(value) | ZAddressMetadataFinalizable | ZAddressGoodMask;
 }

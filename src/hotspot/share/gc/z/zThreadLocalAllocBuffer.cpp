@@ -66,11 +66,15 @@ static void fixup_address(HeapWord** p) {
   *p = (HeapWord*)ZAddress::good_or_null((uintptr_t)*p);
 }
 
+static void fixup_keep_address(HeapWord** p) {
+    *p = (HeapWord*)ZAddress::keep_or_null((uintptr_t)*p);
+}
+
 void ZThreadLocalAllocBuffer::retire(JavaThread* thread, ThreadLocalAllocStats* stats) {
   if (UseTLAB) {
     stats->reset();
     thread->tlab().addresses_do(fixup_address);
-    thread->tklab().addresses_do(fixup_address);
+    thread->tklab().addresses_do(fixup_keep_address);
     thread->tlab().retire(stats);
     thread->tklab().retire(stats);
     if (ResizeTLAB) {
@@ -83,7 +87,7 @@ void ZThreadLocalAllocBuffer::retire(JavaThread* thread, ThreadLocalAllocStats* 
 void ZThreadLocalAllocBuffer::remap(JavaThread* thread) {
   if (UseTLAB) {
     thread->tlab().addresses_do(fixup_address);
-    thread->tklab().addresses_do(fixup_address);
+    thread->tklab().addresses_do(fixup_keep_address);
   }
 }
 

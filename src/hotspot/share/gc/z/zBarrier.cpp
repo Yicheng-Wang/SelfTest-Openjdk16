@@ -90,10 +90,6 @@ uintptr_t ZBarrier::mark(uintptr_t addr) {
     good_addr = remap(addr);
   }
 
-  if(ZHeap::heap()->is_object_in_keep(good_addr) && !ZDriver::KeepPermit){
-      good_addr = ZAddress::keep(good_addr);
-  }
-
   // Mark
   if (should_mark_through<finalizable>(addr)) {
     ZHeap::heap()->mark_object<follow, finalizable, publish>(good_addr);

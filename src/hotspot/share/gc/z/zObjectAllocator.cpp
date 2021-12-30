@@ -91,7 +91,7 @@ uintptr_t ZObjectAllocator::alloc_in_keep_page(uint8_t page_type,
     if (new_page != NULL) {// Allocate object before installing the new page
         addr = new_page->alloc_object(size);
     }
-    return addr;
+    return ZAddress::keep(addr);
 }
 
 uintptr_t ZObjectAllocator::alloc_object_in_shared_page(ZPage** shared_page,

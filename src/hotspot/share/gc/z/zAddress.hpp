@@ -58,6 +58,7 @@ public:
   static uintptr_t good(uintptr_t value);
   static uintptr_t keep(uintptr_t value);
   static uintptr_t good_or_null(uintptr_t value);
+  static uintptr_t keep_or_null(uintptr_t value);
   static uintptr_t finalizable_good(uintptr_t value);
   static uintptr_t marked(uintptr_t value);
   static uintptr_t marked0(uintptr_t value);
