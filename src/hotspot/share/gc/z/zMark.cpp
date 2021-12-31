@@ -313,10 +313,6 @@ void ZMark::mark_and_follow(ZMarkCache* cache, ZMarkStackEntry entry) {
   // Decode object address and follow flag
   const uintptr_t addr = entry.object_address();
 
-  if(ZAddress::is_keep(addr)){
-      follow_object(ZOop::from_address(addr),finalizable);
-  }
-
   if (!try_mark_object(cache, addr, finalizable)) {
     // Already marked
     return;

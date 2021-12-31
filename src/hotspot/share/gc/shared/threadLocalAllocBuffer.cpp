@@ -249,7 +249,7 @@ void ThreadLocalAllocBuffer::startup_initialization() {
     int lines =  MAX2(AllocatePrefetchLines, AllocateInstancePrefetchLines) + 2;
     _reserve_for_allocation_prefetch = (AllocatePrefetchDistance + AllocatePrefetchStepSize * lines) /
                                        (int)HeapWordSize;
-      log_info(gc, heap)("_reserve_for_allocation_prefetch is %d: ",_reserve_for_allocation_prefetch);
+      //log_info(gc, heap)("_reserve_for_allocation_prefetch is %d: ",_reserve_for_allocation_prefetch);
   }
 #endif
 

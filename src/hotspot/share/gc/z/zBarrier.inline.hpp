@@ -104,7 +104,7 @@
 //     Remapped(N)       <- Marked(N)
 //                       <- Finalizable(N)
 
-template <bool finalizable>
+/*template <bool finalizable>
 class ZMarkDirectClosure : public ClaimMetadataVisitingOopIterateClosure {
 public:
     ZMarkDirectClosure() :
@@ -122,7 +122,7 @@ public:
     virtual void do_oop(narrowOop* p) {
         ShouldNotReachHere();
     }
-};
+};*/
 
 template <ZBarrierFastPath fast_path>
 inline void ZBarrier::self_heal(volatile oop* p, uintptr_t addr, uintptr_t heal_addr) {
@@ -136,6 +136,7 @@ inline void ZBarrier::self_heal(volatile oop* p, uintptr_t addr, uintptr_t heal_
 
   assert(!fast_path(addr), "Invalid self heal");
   assert(fast_path(heal_addr), "Invalid self heal");
+  assert(!ZAddress::is_keep(addr),"Not heal Keep");
 
   for (;;) {
     // Heal
@@ -223,7 +224,7 @@ inline void ZBarrier::root_barrier(oop* p, oop o) {
 }
 
 inline bool ZBarrier::is_good_or_null_fast_path(uintptr_t addr) {
-  return ZAddress::is_good_or_null(addr);
+  return ZAddress::is_good_or_null(addr) || ZAddress::is_keep(addr);
 }
 
 inline bool ZBarrier::is_not_keep_fast_path(uintptr_t addr) {
@@ -231,11 +232,11 @@ inline bool ZBarrier::is_not_keep_fast_path(uintptr_t addr) {
 }
 
 inline bool ZBarrier::is_weak_good_or_null_fast_path(uintptr_t addr) {
-  return ZAddress::is_weak_good_or_null(addr);
+  return ZAddress::is_weak_good_or_null(addr) || ZAddress::is_keep(addr);
 }
 
 inline bool ZBarrier::is_marked_or_null_fast_path(uintptr_t addr) {
-  return ZAddress::is_marked_or_null(addr);
+  return ZAddress::is_marked_or_null(addr) || ZAddress::is_keep(addr);
 }
 
 inline bool ZBarrier::during_mark() {
@@ -259,13 +260,13 @@ inline oop ZBarrier::load_barrier_on_oop_field(volatile oop* p) {
 }
 
 inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o) {
-    if(ZAddress::is_keep(ZOop::to_address(o))){
-        /*ZBarrier::skipbarrier++;
+    /*if(ZAddress::is_keep(ZOop::to_address(o))){
+        ZBarrier::skipbarrier++;
         if(ZBarrier::skipbarrier/(1024*1024)!=(ZBarrier::skipbarrier-1)/(1024*1024)) {
             log_info(gc, heap)("Skip Load: " SIZE_FORMAT, ZBarrier::skipbarrier);
-        }*/
+        }
         return o;
-    }
+    }*/
   return barrier<is_good_or_null_fast_path, load_barrier_on_oop_slow_path>(p, o);
 }
 
@@ -325,13 +326,13 @@ inline oop ZBarrier::weak_load_barrier_on_oop_field(volatile oop* p) {
 }
 
 inline oop ZBarrier::weak_load_barrier_on_oop_field_preloaded(volatile oop* p, oop o) {
-    if(ZAddress::is_keep(ZOop::to_address(o))){
-        /*ZBarrier::skipweakbarrier++;
+    /*if(ZAddress::is_keep(ZOop::to_address(o))){
+        ZBarrier::skipweakbarrier++;
         if(ZBarrier::skipweakbarrier/(1024)!=(ZBarrier::skipweakbarrier-1)/(1024)){
             log_info(gc, heap)("Skip Weak Load: " SIZE_FORMAT ,ZBarrier::skipweakbarrier);
-        }*/
+        }
         return o;
-    }
+    }*/
     /*else{
         ZBarrier::non_skipweakbarrier++;
         if(ZBarrier::non_skipweakbarrier/(1024*256)!=(ZBarrier::non_skipweakbarrier-1)/(1024*256)){
@@ -439,7 +440,7 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
     const uintptr_t addr = ZOop::to_address(o);
     if(ZAddress::is_keep(addr)){
         if(!ZDriver::KeepPermit){
-            ZHeap::heap()->mark_object<true, false, true>(addr);
+            //ZHeap::heap()->mark_object<true, false, true>(addr);
             return;
         }
         else
