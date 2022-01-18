@@ -224,7 +224,7 @@ inline void ZBarrier::root_barrier(oop* p, oop o) {
 }
 
 inline bool ZBarrier::is_good_or_null_fast_path(uintptr_t addr) {
-  return ZAddress::is_good_or_null(addr) || ZAddress::is_keep(addr);
+  return ZAddress::is_good_or_null(addr);
 }
 
 inline bool ZBarrier::is_not_keep_fast_path(uintptr_t addr) {
@@ -236,7 +236,7 @@ inline bool ZBarrier::is_weak_good_or_null_fast_path(uintptr_t addr) {
 }
 
 inline bool ZBarrier::is_marked_or_null_fast_path(uintptr_t addr) {
-  return ZAddress::is_marked_or_null(addr) || ZAddress::is_keep(addr);
+  return ZAddress::is_marked_or_null(addr);
 }
 
 inline bool ZBarrier::during_mark() {
@@ -261,18 +261,18 @@ inline oop ZBarrier::load_barrier_on_oop_field(volatile oop* p) {
 
 inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o) {
     if(ZAddress::is_keep(ZOop::to_address(o))){
-        ZBarrier::skipbarrier++;
+        /*ZBarrier::skipbarrier++;
         if(ZBarrier::skipbarrier/(1024*1024)!=(ZBarrier::skipbarrier-1)/(1024*1024)) {
             log_info(gc, heap)("Skip Load: " SIZE_FORMAT, ZBarrier::skipbarrier);
-        }
+        }*/
         return o;
     }
-    else{
+    /*else{
         ZBarrier::non_skipbarrier++;
         if(ZBarrier::non_skipbarrier/(1024*1024*64)!=(ZBarrier::non_skipbarrier-1)/(1024*1024*64)) {
             log_info(gc, heap)("Not Jump Load: " SIZE_FORMAT, ZBarrier::non_skipbarrier);
         }
-    }
+    }*/
   return barrier<is_good_or_null_fast_path, load_barrier_on_oop_slow_path>(p, o);
 }
 
@@ -332,7 +332,7 @@ inline oop ZBarrier::weak_load_barrier_on_oop_field(volatile oop* p) {
 }
 
 inline oop ZBarrier::weak_load_barrier_on_oop_field_preloaded(volatile oop* p, oop o) {
-    if(ZAddress::is_keep(ZOop::to_address(o))){
+    /*if(ZAddress::is_keep(ZOop::to_address(o))){
         ZBarrier::skipweakbarrier++;
         if(ZBarrier::skipweakbarrier/(1024)!=(ZBarrier::skipweakbarrier-1)/(1024)){
             log_info(gc, heap)("Skip Weak Load: " SIZE_FORMAT ,ZBarrier::skipweakbarrier);
@@ -345,7 +345,7 @@ inline oop ZBarrier::weak_load_barrier_on_oop_field_preloaded(volatile oop* p, o
         if(ZBarrier::non_skipweakbarrier/(1024*256)!=(ZBarrier::non_skipweakbarrier-1)/(1024*256)){
             log_info(gc, heap)("None Jump Weak Mark: " SIZE_FORMAT ,ZBarrier::non_skipweakbarrier);
         }
-    }
+    }*/
   return weak_barrier<is_weak_good_or_null_fast_path, weak_load_barrier_on_oop_slow_path>(p, o);
 }
 
