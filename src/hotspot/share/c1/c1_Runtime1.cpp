@@ -366,7 +366,7 @@ JRT_ENTRY(void, Runtime1::new_instance(JavaThread* thread, Klass* klass))
   // make sure klass is initialized
   h->initialize(CHECK);
   // allocate instance and return via TLS
-  oop obj = h->allocate_instance(CHECK);
+  oop obj = h->allocate_instance(0,CHECK);
   thread->set_vm_result(obj);
 JRT_END
 
