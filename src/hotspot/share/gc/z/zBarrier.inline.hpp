@@ -269,7 +269,7 @@ inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o)
     }
     else{
         ZBarrier::non_skipbarrier++;
-        if(ZBarrier::non_skipbarrier/(1024*1024)!=(ZBarrier::non_skipbarrier-1)/(1024*1024*64)) {
+        if(ZBarrier::non_skipbarrier/(1024*1024*64)!=(ZBarrier::non_skipbarrier-1)/(1024*1024*64)) {
             log_info(gc, heap)("Not Jump Load: " SIZE_FORMAT, ZBarrier::non_skipbarrier);
         }
     }
