@@ -1165,7 +1165,7 @@ bool PhaseMacroExpand::eliminate_boxing_node(CallStaticJavaNode *boxing) {
 void PhaseMacroExpand::set_eden_pointers(Node* &eden_top_adr, Node* &eden_end_adr, int alloc_gen) {
   if (UseTLAB) {                // Private allocation: load from TLS
     if(alloc_gen>0){
-        log_info(gc, heap)("C2 TKLAB Allocation!");
+        //log_info(gc, heap)("C2 TKLAB Allocation!");
         Node* thread = transform_later(new ThreadLocalNode());
         int tklab_top_offset = in_bytes(JavaThread::tklab_top_offset());
         int tklab_end_offset = in_bytes(JavaThread::tklab_end_offset());

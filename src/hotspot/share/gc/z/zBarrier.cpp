@@ -78,7 +78,7 @@ bool ZBarrier::should_mark_through(uintptr_t addr) {
 template <bool follow, bool finalizable, bool publish>
 uintptr_t ZBarrier::mark(uintptr_t addr) {
   uintptr_t good_addr;
-  assert(!ZAddress::is_keep(addr),"Not mark Keep");
+  //assert(!ZAddress::is_keep(addr),"Not mark Keep");
   if (ZAddress::is_marked(addr)) {
     // Already marked, but try to mark though anyway
     good_addr = ZAddress::good(addr);
