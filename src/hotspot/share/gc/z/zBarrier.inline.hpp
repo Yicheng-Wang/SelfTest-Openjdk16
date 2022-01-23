@@ -224,7 +224,7 @@ inline void ZBarrier::root_barrier(oop* p, oop o) {
 }
 
 inline bool ZBarrier::is_good_or_null_fast_path(uintptr_t addr) {
-  return ZAddress::is_keep(addr) || ZAddress::is_good_or_null(addr);
+  return ZAddress::is_good_or_null(addr) || ZAddress::is_keep(addr);
 }
 
 inline bool ZBarrier::is_not_keep_fast_path(uintptr_t addr) {
@@ -274,7 +274,7 @@ inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o)
         }
     }*/
     ZBarrier::non_skipbarrier++;
-    if(ZBarrier::non_skipbarrier/(1024*1024*64)!=(ZBarrier::non_skipbarrier-1)/(1024*1024*64)) {
+    if(ZBarrier::non_skipbarrier/(1024*1024)!=(ZBarrier::non_skipbarrier-1)/(1024*1024)) {
         log_info(gc, heap)("Not Jump Load: " SIZE_FORMAT, ZBarrier::non_skipbarrier);
     }
   return barrier<is_good_or_null_fast_path, load_barrier_on_oop_slow_path>(p, o);

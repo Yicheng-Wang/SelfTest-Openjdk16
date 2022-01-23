@@ -111,9 +111,21 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
   // Load oop at address
   __ movptr(dst, Address(scratch, 0));
 
+  __ andl(dst,address_keep_mask_from_thread(r15_thread));
+  __ cmpptr(dst,address_keep_mask_from_thread(r15_thread));
+  __ jcc(Assembler::equal, done);
+  __ movptr(dst, Address(scratch, 0));
+
   // Test address bad mask
   __ testptr(dst, address_bad_mask_from_thread(r15_thread));
   __ jcc(Assembler::zero, done);
+
+  //__ push(r13);
+
+  //__ push(scratch);
+  //__ movptr(scratch,dst);
+
+  //__ lea(scratch, src);
 
   //
   // Slow path
