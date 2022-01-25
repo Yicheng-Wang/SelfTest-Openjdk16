@@ -27,7 +27,16 @@
 #include "runtime/interfaceSupport.inline.hpp"
 
 JRT_LEAF(oopDesc*, ZBarrierSetRuntime::load_barrier_on_oop_field_preloaded(oopDesc* o, oop* p))
+    if(ZAddress::is_keep(ZOop::to_address(o))){
+        log_info(gc, heap)("Skip Load:");
+    }
   return ZBarrier::load_barrier_on_oop_field_preloaded(p, o);
+JRT_END
+
+JRT_LEAF(void, ZBarrierSetRuntime::check_value(oopDesc* o, oop* p))
+    if(ZAddress::is_keep(ZOop::to_address(o))){
+        log_info(gc, heap)("Skip Load:");
+    }
 JRT_END
 
 JRT_LEAF(oopDesc*, ZBarrierSetRuntime::weak_load_barrier_on_oop_field_preloaded(oopDesc* o, oop* p))
@@ -110,4 +119,8 @@ address ZBarrierSetRuntime::load_barrier_on_oop_array_addr() {
 
 address ZBarrierSetRuntime::clone_addr() {
   return reinterpret_cast<address>(clone);
+}
+
+address ZBarrierSetRuntime::check_address_value(){
+    return reinterpret_cast<address>(check_value);
 }
