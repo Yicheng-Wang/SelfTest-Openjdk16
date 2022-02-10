@@ -112,11 +112,11 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
   // Load oop at address
   __ movptr(dst, Address(scratch, 0));
   //__ movptr(scratch, address_keep_mask_from_thread(r15_thread));
-  call_vm(masm, ZBarrierSetRuntime::check_address_value(), dst, scratch);
-  __ shrq(dst,32);
+  //call_vm(masm, ZBarrierSetRuntime::check_address_value(), dst, scratch);
+  __ shrq(dst,42);
 
-  call_vm(masm, ZBarrierSetRuntime::check_address_value(), dst, scratch);
-  __ cmpptr(dst,address_keep_mask_from_thread(r15_thread));
+  //call_vm(masm, ZBarrierSetRuntime::check_address_value(), dst, scratch);
+  __ cmpptr(dst,3);
   __ jcc(Assembler::equal, done);
   __ movptr(dst, Address(scratch, 0));
 
