@@ -260,13 +260,13 @@ inline oop ZBarrier::load_barrier_on_oop_field(volatile oop* p) {
 }
 
 inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o) {
-    /*if(ZAddress::is_keep(ZOop::to_address(o))){
+    if(ZAddress::is_keep(ZOop::to_address(o))){
         ZBarrier::skipbarrier++;
         if(ZBarrier::skipbarrier/(1024*1024)!=(ZBarrier::skipbarrier-1)/(1024*1024)) {
             log_info(gc, heap)("Skip Load: " SIZE_FORMAT, ZBarrier::skipbarrier);
         }
         return o;
-    }*/
+    }
     /*else{
         ZBarrier::non_skipbarrier++;
         if(ZBarrier::non_skipbarrier/(1024*1024*64)!=(ZBarrier::non_skipbarrier-1)/(1024*1024*64)) {

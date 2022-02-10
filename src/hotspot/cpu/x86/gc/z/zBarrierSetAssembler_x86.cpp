@@ -122,6 +122,7 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
 
   __ cmpl(dst,(int)3);
   __ jcc(Assembler::equal, done);
+  __ movptr(dst, Address(scratch, 0));
 
   //__ push(r13);
 
@@ -193,6 +194,7 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
 
   __ bind(done);
   __ movptr(dst, Address(scratch, 0));
+
   // Restore scratch register
   if (tmp1 == noreg) {
     __ pop(scratch);
@@ -217,12 +219,12 @@ void ZBarrierSetAssembler::store_at(MacroAssembler* masm,
     // Note that src could be noreg, which means we
     // are storing null and can skip verification.
     if (src != noreg) {
-      Label done;
-      __ testptr(src, address_bad_mask_from_thread(r15_thread));
-      __ jcc(Assembler::zero, done);
+      //Label done;
+      //__ testptr(src, address_bad_mask_from_thread(r15_thread));
+      //__ jcc(Assembler::zero, done);
       //__ stop("Verify oop store failed");
       //__ should_not_reach_here();
-      __ bind(done);
+      //__ bind(done);
     }
   }
 
