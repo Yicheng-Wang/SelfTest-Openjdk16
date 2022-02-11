@@ -27,9 +27,9 @@
 #include "runtime/interfaceSupport.inline.hpp"
 
 JRT_LEAF(oopDesc*, ZBarrierSetRuntime::load_barrier_on_oop_field_preloaded(oopDesc* o, oop* p))
-    if(ZAddress::is_keep(ZOop::to_address(o))){
+    /*if(ZAddress::is_keep(ZOop::to_address(o))){
         log_info(gc, heap)("Skip Load:");
-    }
+    }*/
   return ZBarrier::load_barrier_on_oop_field_preloaded(p, o);
 JRT_END
 
