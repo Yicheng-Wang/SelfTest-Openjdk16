@@ -224,7 +224,7 @@ inline void ZBarrier::root_barrier(oop* p, oop o) {
 }
 
 inline bool ZBarrier::is_good_or_null_fast_path(uintptr_t addr) {
-  return ZAddress::is_good_or_null(addr) || ZAddress::is_keep(addr);
+  return ZAddress::is_good_or_null(addr);
 }
 
 inline bool ZBarrier::is_not_keep_fast_path(uintptr_t addr) {
