@@ -101,10 +101,8 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
   //Address keep = address_keep_mask_from_thread(r15_thread);
   //Address bad = address_bad_mask_from_thread(r15_thread);
   Label done;
-  Label barrier;
 
-  static const int64_t is_keep_low = 0xc0000000000;
-  static const int64_t is_keep_high = 0xd0000000000;
+  static const int64_t is_keep_low = 0x1c0000000000;
   //
   // Fast Path
   //
@@ -117,16 +115,15 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
   //__ movptr(scratch, address_keep_mask_from_thread(r15_thread));
   //call_vm(masm, ZBarrierSetRuntime::check_address_value(), dst, scratch);
 
+  __ cmp64(dst, ExternalAddress((address) &is_keep_low));
+  __ jcc(Assembler::greater, done);
+
   // Test address bad mask
   __ testptr(dst, address_bad_mask_from_thread(r15_thread));
   __ jcc(Assembler::zero, done);
 
-  __ cmp64(dst, ExternalAddress((address) &is_keep_low));
-  __ jcc(Assembler::less, barrier);
-  __ cmp64(dst, ExternalAddress((address) &is_keep_high));
-  __ jcc(Assembler::less, done);
 
-  __ bind(barrier);
+
 
   /*__ shrq(dst,(int)42);
 
