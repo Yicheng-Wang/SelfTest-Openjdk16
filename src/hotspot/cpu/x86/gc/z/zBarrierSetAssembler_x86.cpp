@@ -102,7 +102,7 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
   //Address bad = address_bad_mask_from_thread(r15_thread);
   Label done;
 
-  static const int64_t is_keep_low = 0x1c0000000000;
+  static const int64_t is_keep_low = 0x3c0000000000;
   //
   // Fast Path
   //

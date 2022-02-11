@@ -33,7 +33,7 @@ source %{
 #include "c2_intelJccErratum_x86.hpp"
 
 static void z_load_barrier(MacroAssembler& _masm, const MachNode* node, Address ref_addr, Register ref, Register tmp, uint8_t barrier_data) {
-    static const int64_t is_keep_low = 0x1c0000000000;
+    static const int64_t is_keep_low = 0x3c0000000000;
     if (barrier_data == ZLoadBarrierElided) {
     return;			// Elided.
   }

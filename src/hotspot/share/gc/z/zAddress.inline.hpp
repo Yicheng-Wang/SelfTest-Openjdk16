@@ -46,7 +46,7 @@ inline bool ZAddress::is_good(uintptr_t value) {
 }
 
 inline bool ZAddress::is_keep(uintptr_t value) {
-    return (value & ZAddressMetadataMarked0) && (value & ZAddressMetadataMarked1) && (value & ZAddressMetadataRemapped);
+    return (value & ZAddressMetadataMarked0) && (value & ZAddressMetadataMarked1) && (value & ZAddressMetadataRemapped) && (value & ZAddressMetadataFinalizable);
 }
 
 inline bool ZAddress::is_good_or_null(uintptr_t value) {
