@@ -265,7 +265,7 @@ inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o)
         if(ZBarrier::skipbarrier/(1024*1024)!=(ZBarrier::skipbarrier-1)/(1024*1024)) {
             log_info(gc, heap)("Skip Load: " SIZE_FORMAT, ZBarrier::skipbarrier);
         }
-        return o;
+        //return o;
     }
     /*else{
         ZBarrier::non_skipbarrier++;
