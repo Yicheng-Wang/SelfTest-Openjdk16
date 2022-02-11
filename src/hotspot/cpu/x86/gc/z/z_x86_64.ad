@@ -33,16 +33,34 @@ source %{
 #include "c2_intelJccErratum_x86.hpp"
 
 static void z_load_barrier(MacroAssembler& _masm, const MachNode* node, Address ref_addr, Register ref, Register tmp, uint8_t barrier_data) {
-  if (barrier_data == ZLoadBarrierElided) {
+    static const int64_t is_keep_low = 0xc0000000000;
+    static const int64_t is_keep_high = 0xd0000000000;
+    Label test;
+    if (barrier_data == ZLoadBarrierElided) {
     return;			// Elided.
   }
   ZLoadBarrierStubC2* const stub = ZLoadBarrierStubC2::create(node, ref_addr, ref, tmp, barrier_data);
-  {
-    IntelJccErratumAlignment intel_alignment(_masm, 10 /* jcc_size */);
-    __ testptr(ref, Address(r15_thread, ZThreadLocalData::address_bad_mask_offset()));
-    __ jcc(Assembler::notZero, *stub->entry());
-  }
-  __ bind(*stub->continuation());
+    {
+        IntelJccErratumAlignment intel_alignment(_masm, 20 /* jcc_size */);
+        __ cmp64(ref, ExternalAddress((address) & is_keep_high));
+        __ jcc(Assembler::greater, test);
+    }
+    {
+        IntelJccErratumAlignment intel_alignment(_masm, 20 /* jcc_size */);
+        __ cmp64(ref, ExternalAddress((address) &is_keep_low));
+        __ jcc(Assembler::less, test);
+    }
+    {
+        IntelJccErratumAlignment intel_alignment(_masm, 20 /* jcc_size */);
+        __ jmp(*stub->continuation());
+    }
+    __ bind(test);
+    {
+        IntelJccErratumAlignment intel_alignment(_masm, 10 /* jcc_size */);
+        __ testptr(ref, Address(r15_thread, ZThreadLocalData::address_bad_mask_offset()));
+        __ jcc(Assembler::notZero, *stub->entry());
+    }
+    __ bind(*stub->continuation());
 }
 
 static void z_load_barrier_cmpxchg(MacroAssembler& _masm, const MachNode* node, Address ref_addr, Register ref, Register tmp, Label& good) {

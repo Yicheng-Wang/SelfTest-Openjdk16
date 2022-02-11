@@ -101,7 +101,10 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
   //Address keep = address_keep_mask_from_thread(r15_thread);
   //Address bad = address_bad_mask_from_thread(r15_thread);
   Label done;
+  Label barrier;
 
+  static const int64_t is_keep_low = 0xc0000000000;
+  static const int64_t is_keep_high = 0xd0000000000;
   //
   // Fast Path
   //
@@ -118,11 +121,18 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
   __ testptr(dst, address_bad_mask_from_thread(r15_thread));
   __ jcc(Assembler::zero, done);
 
-  __ shrq(dst,(int)42);
+  __ cmp64(dst, ExternalAddress((address) &is_keep_low));
+  __ jcc(Assembler::less, barrier);
+  __ cmp64(dst, ExternalAddress((address) &is_keep_high));
+  __ jcc(Assembler::less, done);
+
+  __ bind(barrier);
+
+  /*__ shrq(dst,(int)42);
 
   __ cmpl(dst,(int)3);
   __ jcc(Assembler::equal, done);
-  __ movptr(dst, Address(scratch, 0));
+  __ movptr(dst, Address(scratch, 0));*/
 
   //__ push(r13);
 
@@ -193,7 +203,7 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
   }
 
   __ bind(done);
-  __ movptr(dst, Address(scratch, 0));
+  //__ movptr(dst, Address(scratch, 0));
 
   // Restore scratch register
   if (tmp1 == noreg) {
