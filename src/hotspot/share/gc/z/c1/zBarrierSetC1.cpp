@@ -117,6 +117,35 @@ public:
 #endif // PRODUCT
 };
 
+class LIR_OpZLoadBarrierKeepTest : public LIR_Op {
+private:
+    LIR_Opr _opr;
+
+public:
+    LIR_OpZLoadBarrierKeepTest(LIR_Opr opr) :
+            LIR_Op(),
+            _opr(opr) {}
+
+    virtual void visit(LIR_OpVisitState* state) {
+        state->do_input(_opr);
+    }
+
+    virtual void emit_code(LIR_Assembler* ce) {
+        ZBarrierSet::assembler()->generate_c1_load_barrier_keep_test(ce, _opr);
+    }
+
+    virtual void print_instr(outputStream* out) const {
+        _opr->print(out);
+        out->print(" ");
+    }
+
+#ifndef PRODUCT
+    virtual const char* name() const {
+        return "lir_z_load_barrier_keep_test";
+    }
+#endif // PRODUCT
+};
+
 static bool barrier_needed(LIRAccess& access) {
   return ZBarrierSet::barrier_needed(access.decorators(), access.type());
 }
@@ -144,11 +173,16 @@ address ZBarrierSetC1::load_barrier_on_oop_field_preloaded_runtime_stub(Decorato
 
 void ZBarrierSetC1::load_barrier(LIRAccess& access, LIR_Opr result) const {
   // Fast path
-  __ append(new LIR_OpZLoadBarrierTest(result));
-
-  // Slow path
   const address runtime_stub = load_barrier_on_oop_field_preloaded_runtime_stub(access.decorators());
   CodeStub* const stub = new ZLoadBarrierStubC1(access, result, runtime_stub);
+
+
+  __ append(new LIR_OpZLoadBarrierKeepTest(result));
+  __ branch(lir_cond_greaterEqual, stub->continuation());
+
+  __ append(new LIR_OpZLoadBarrierTest(result));
+  // Slow path
+
   __ branch(lir_cond_notEqual, stub);
   __ branch_destination(stub->continuation());
 }

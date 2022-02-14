@@ -57,9 +57,9 @@ inline bool ZAddress::is_good_or_null(uintptr_t value) {
   // This means that an address without mask bits would pass through
   // the barrier as if it was null. This should be harmless as such
   // addresses should ever be passed through the barrier.
-  const bool result = is_good(value) || is_null(value);
+  //const bool result = is_good(value) || is_null(value);
   //assert((is_good(value) || is_null(value)) == result, "Bad address");
-  return result;
+  return is_good(value) || is_null(value);
 }
 
 inline bool ZAddress::is_weak_bad(uintptr_t value) {

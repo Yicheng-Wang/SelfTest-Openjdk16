@@ -116,7 +116,7 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
   //call_vm(masm, ZBarrierSetRuntime::check_address_value(), dst, scratch);
 
   __ cmp64(dst, ExternalAddress((address) &is_keep_low));
-  __ jcc(Assembler::greater, done);
+  __ jcc(Assembler::greaterEqual, done);
 
   // Test address bad mask
   __ testptr(dst, address_bad_mask_from_thread(r15_thread));
@@ -222,7 +222,7 @@ void ZBarrierSetAssembler::store_at(MacroAssembler* masm,
   BLOCK_COMMENT("ZBarrierSetAssembler::store_at {");
 
   // Verify oop store
-  if (is_reference_type(type)) {
+  /*if (is_reference_type(type)) {
     // Note that src could be noreg, which means we
     // are storing null and can skip verification.
     if (src != noreg) {
@@ -233,7 +233,7 @@ void ZBarrierSetAssembler::store_at(MacroAssembler* masm,
       //__ should_not_reach_here();
       //__ bind(done);
     }
-  }
+  }*/
 
   // Store value
   BarrierSetAssembler::store_at(masm, decorators, type, dst, src, tmp1, tmp2);
@@ -294,6 +294,13 @@ void ZBarrierSetAssembler::generate_c1_load_barrier_test(LIR_Assembler* ce,
                                                          LIR_Opr ref) const {
   __ testptr(ref->as_register(), address_bad_mask_from_thread(r15_thread));
 }
+
+void ZBarrierSetAssembler::generate_c1_load_barrier_keep_test(LIR_Assembler* ce,
+                                                         LIR_Opr ref) const {
+    static const int64_t is_keep_low = 0x3c0000000000;
+    __ cmp64(ref->as_register(), ExternalAddress((address) &is_keep_low));
+}
+
 
 void ZBarrierSetAssembler::generate_c1_load_barrier_stub(LIR_Assembler* ce,
                                                          ZLoadBarrierStubC1* stub) const {
