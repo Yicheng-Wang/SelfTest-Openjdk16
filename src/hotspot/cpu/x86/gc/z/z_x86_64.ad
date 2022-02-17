@@ -38,13 +38,13 @@ static void z_load_barrier(MacroAssembler& _masm, const MachNode* node, Address 
   }
   ZLoadBarrierStubC2* const stub = ZLoadBarrierStubC2::create(node, ref_addr, ref, tmp, barrier_data);
 
-    __ cmpptr(ref, Address(r15_thread, ZThreadLocalData::address_keep_mask_offset()));
-    __ jcc(Assembler::greaterEqual, *stub->continuation());
+    //__ cmpptr(ref, Address(r15_thread, ZThreadLocalData::address_keep_mask_offset()));
+    //__ jcc(Assembler::greaterEqual, *stub->continuation());
 
     {
         IntelJccErratumAlignment intel_alignment(_masm, 10 /* jcc_size */);
-        __ testptr(ref, Address(r15_thread, ZThreadLocalData::address_bad_mask_offset()));
-        __ jcc(Assembler::notZero, *stub->entry());
+        __ testptr(ref, Address(r15_thread, ZThreadLocalData::address_keep_mask_offset()));
+        __ jcc(Assembler::zero, *stub->entry());
     }
     __ bind(*stub->continuation());
 }

@@ -115,12 +115,14 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
   //__ movptr(scratch, address_keep_mask_from_thread(r15_thread));
   //call_vm(masm, ZBarrierSetRuntime::check_address_value(), dst, scratch);
 
-  __ cmpptr(dst, address_keep_mask_from_thread(r15_thread));
-  __ jcc(Assembler::greaterEqual, done);
+  //__ cmpptr(dst, address_keep_mask_from_thread(r15_thread));
+  //__ jcc(Assembler::greaterEqual, done);
 
   // Test address bad mask
-  __ testptr(dst, address_bad_mask_from_thread(r15_thread));
-  __ jcc(Assembler::zero, done);
+  __ testptr(dst, address_keep_mask_from_thread(r15_thread));
+  __ jcc(Assembler::notZero, done);
+
+    //call_vm(masm, ZBarrierSetRuntime::check_address_value(), dst, scratch);
 
 
 
@@ -292,7 +294,7 @@ void ZBarrierSetAssembler::try_resolve_jobject_in_native(MacroAssembler* masm,
 
 void ZBarrierSetAssembler::generate_c1_load_barrier_test(LIR_Assembler* ce,
                                                          LIR_Opr ref) const {
-  __ testptr(ref->as_register(), address_bad_mask_from_thread(r15_thread));
+  __ testptr(ref->as_register(), address_keep_mask_from_thread(r15_thread));
 }
 
 void ZBarrierSetAssembler::generate_c1_load_barrier_keep_test(LIR_Assembler* ce,

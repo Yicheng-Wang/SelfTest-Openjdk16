@@ -39,7 +39,7 @@ private:
 
   ZThreadLocalData() :
       _address_bad_mask(0),
-      _address_keep_mask(ZAddressKeepMask),
+      _address_keep_mask(0),
       _stacks(),
       _invisible_root(NULL) {}
 
@@ -58,6 +58,10 @@ public:
 
   static void set_address_bad_mask(Thread* thread, uintptr_t mask) {
     data(thread)->_address_bad_mask = mask;
+  }
+
+  static void set_address_keep_mask(Thread* thread, uintptr_t mask) {
+    data(thread)->_address_keep_mask = mask;
   }
 
   static ZMarkThreadLocalStacks* stacks(Thread* thread) {
