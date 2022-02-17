@@ -136,7 +136,7 @@ inline void ZBarrier::self_heal(volatile oop* p, uintptr_t addr, uintptr_t heal_
 
   assert(!fast_path(addr), "Invalid self heal");
   assert(fast_path(heal_addr), "Invalid self heal");
-  assert(!ZAddress::is_keep(addr),"Not heal Keep");
+  //assert(!ZAddress::is_keep(addr),"Not heal Keep");
 
   for (;;) {
     // Heal
@@ -432,7 +432,7 @@ inline void ZBarrier::keep_alive_barrier_on_phantom_root_oop_field(oop* p) {
 
 inline void ZBarrier::keep_alive_barrier_on_oop(oop o) {
   const uintptr_t addr = ZOop::to_address(o);
-  assert(ZAddress::is_good(addr) || ZAddress::is_keep(addr), "Invalid address");
+  assert(ZAddress::is_good(addr), "Invalid address");
 
   if (during_mark()) {
     mark_barrier_on_oop_slow_path(addr);

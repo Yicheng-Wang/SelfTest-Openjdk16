@@ -27,9 +27,9 @@
 #include "runtime/interfaceSupport.inline.hpp"
 
 JRT_LEAF(oopDesc*, ZBarrierSetRuntime::load_barrier_on_oop_field_preloaded(oopDesc* o, oop* p))
-    if(ZAddress::is_keep(ZOop::to_address(o))){
+    /*if(ZAddress::is_keep(ZOop::to_address(o))){
         log_info(gc, heap)("Throw Barrier:");
-    }
+    }*/
     /*if(ZAddress::is_good(ZOop::to_address(o))){
         uintptr_t good = ZAddressGoodMask;
         log_info(gc, heap)("Why here:");

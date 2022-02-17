@@ -281,8 +281,8 @@ void ZBarrierSetAssembler::try_resolve_jobject_in_native(MacroAssembler* masm,
   BarrierSetAssembler::try_resolve_jobject_in_native(masm, jni_env, obj, tmp, slowpath);
 
   // Test address bad mask
-  __ testptr(obj, address_bad_mask_from_jni_env(jni_env));
-  __ jcc(Assembler::notZero, slowpath);
+  __ testptr(obj, address_keep_mask_from_jni_env(jni_env));
+  __ jcc(Assembler::zero, slowpath);
 
   BLOCK_COMMENT("} ZBarrierSetAssembler::try_resolve_jobject_in_native");
 }
