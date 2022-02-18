@@ -154,9 +154,7 @@ class CollectedHeap : public CHeapObj<mtInternal> {
                                       size_t requested_size,
                                       size_t* actual_size);
 
-  virtual HeapWord* allocate_new_tklab(size_t min_size,
-                                 size_t requested_size,
-                                 size_t* actual_size);
+  virtual HeapWord* allocate_new_tklab(size_t* actual_size);
 
     // Reinitialize tlabs before resuming mutators.
   virtual void resize_all_tlabs();

@@ -478,9 +478,7 @@ HeapWord* CollectedHeap::allocate_new_tlab(size_t min_size,
   return NULL;
 }
 
-HeapWord* CollectedHeap::allocate_new_tklab(size_t min_size,
-                                           size_t requested_size,
-                                           size_t* actual_size) {
+HeapWord* CollectedHeap::allocate_new_tklab(size_t* actual_size) {
     guarantee(false, "thread-local allocation buffers not supported");
     return NULL;
 }

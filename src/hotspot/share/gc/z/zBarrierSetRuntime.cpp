@@ -65,6 +65,9 @@ JRT_END
 
 JRT_LEAF(void, ZBarrierSetRuntime::load_barrier_on_oop_array(oop* p, size_t length))
   ZBarrier::load_barrier_on_oop_array(p, length);
+  if(ZAddress::is_keep(ZOop::to_address(*p))){
+      log_info(gc, heap)("Array Barrier:");
+  }
 JRT_END
 
 JRT_LEAF(void, ZBarrierSetRuntime::clone(oopDesc* src, oopDesc* dst, size_t size))

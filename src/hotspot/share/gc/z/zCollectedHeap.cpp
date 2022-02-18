@@ -129,7 +129,7 @@ uint32_t ZCollectedHeap::hash_oop(oop obj) const {
 
 HeapWord* ZCollectedHeap::allocate_new_tlab(size_t min_size, size_t requested_size, size_t* actual_size) {
   const size_t size_in_bytes = ZUtils::words_to_bytes(align_object_size(requested_size));
-  const uintptr_t addr = _heap.alloc_tlab(size_in_bytes,0);
+  const uintptr_t addr = _heap.alloc_tlab(size_in_bytes);
 
   if (addr != 0) {
     *actual_size = requested_size;
@@ -141,15 +141,15 @@ HeapWord* ZCollectedHeap::allocate_new_tlab(size_t min_size, size_t requested_si
   return (HeapWord*)addr;
 }
 
-HeapWord* ZCollectedHeap::allocate_new_tklab(size_t min_size, size_t requested_size, size_t* actual_size) {
-    const size_t size_in_bytes = ZUtils::words_to_bytes(align_object_size(requested_size));
-    const uintptr_t addr = _heap.alloc_tklab(size_in_bytes,1);
+HeapWord* ZCollectedHeap::allocate_new_tklab(size_t* actual_size) {
+    //const size_t size_in_bytes = ZUtils::words_to_bytes(align_object_size(requested_size));
+    const uintptr_t addr = _heap.alloc_tklab(ZPageSizeSmall);
     /*_tklabCount++;
     if(_tklabCount/(1024)!=(_tklabCount-1)/(1024)){
         log_info(gc, heap)("Keep TLAB: " SIZE_FORMAT ,_tklabCount);
     }*/
     if (addr != 0) {
-        *actual_size = requested_size;
+        *actual_size = ZUtils::bytes_to_words(ZPageSizeSmall);;
     }
     /*if(!_heap.is_object_in_keep(addr)){
         log_info(gc, heap)("Why not in Keep page?");
@@ -177,7 +177,7 @@ oop ZCollectedHeap::array_allocate(Klass* klass, int alloc_gen, int size, int le
 
 HeapWord* ZCollectedHeap::mem_allocate(size_t size, bool* gc_overhead_limit_was_exceeded) {
   const size_t size_in_bytes = ZUtils::words_to_bytes(align_object_size(size));
-  return (HeapWord*)_heap.alloc_object(size_in_bytes,0);
+  return (HeapWord*)_heap.alloc_object(size_in_bytes);
 }
 
 MetaWord* ZCollectedHeap::satisfy_failed_metadata_allocation(ClassLoaderData* loader_data,

@@ -221,11 +221,10 @@ int InterpreterRuntime::get_alloc_gen(JavaThread* thread, int n_dims = 0) {
     int next_centry = 0;
     frame last = thread->last_frame();
     Method* method = last.interpreter_frame_method();
-    ConstantPool* pool = method->constants();
     //methodHandle method (thread, last_frame.method());
     int bci = last.interpreter_frame_bci();
 
-    AnnotationArray* aa = method->type_annotations();
+
     Array<u2>* aac = method->alloc_anno_cache();
     // First, look into cache.
     if (aac != NULL) {
@@ -242,6 +241,9 @@ int InterpreterRuntime::get_alloc_gen(JavaThread* thread, int n_dims = 0) {
             }
         }
     }
+
+    AnnotationArray* aa = method->type_annotations();
+    ConstantPool* pool = method->constants();
 
     if(aa != NULL && method->alloc_anno() != NULL) {
 

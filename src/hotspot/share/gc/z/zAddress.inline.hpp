@@ -46,7 +46,7 @@ inline bool ZAddress::is_good(uintptr_t value) {
 }
 
 inline bool ZAddress::is_keep(uintptr_t value) {
-    return (value & ZAddressKeepMask) == ZAddressKeepMask;
+    return ! (value & ZAddressMetadataMask ^ ZAddressKeepMask);
 }
 
 inline bool ZAddress::is_good_or_null(uintptr_t value) {
