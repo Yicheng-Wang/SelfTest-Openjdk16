@@ -53,14 +53,28 @@ static void z_load_barrier_cmpxchg(MacroAssembler& _masm, const MachNode* node, 
   ZLoadBarrierStubC2* const stub = ZLoadBarrierStubC2::create(node, ref_addr, ref, tmp, ZLoadBarrierStrong);
   {
     IntelJccErratumAlignment intel_alignment(_masm, 10 /* jcc_size */);
-    __ testptr(ref, Address(r15_thread, ZThreadLocalData::address_keep_mask_offset()));
-    __ jcc(Assembler::notZero, good);
+    __ testptr(ref, Address(r15_thread, ZThreadLocalData::address_bad_mask_offset()));
+    __ jcc(Assembler::zero, good);
   }
   {
     IntelJccErratumAlignment intel_alignment(_masm, 5 /* jcc_size */);
     __ jmp(*stub->entry());
   }
   __ bind(*stub->continuation());
+
+    /*
+    {
+        IntelJccErratumAlignment intel_alignment(_masm, 10 );
+        __ testptr(ref, Address(r15_thread, ZThreadLocalData::address_keep_mask_offset()));
+        __ jcc(Assembler::zero, *stub->entry());
+    }
+    __ bind(*stub->continuation());
+    {
+        IntelJccErratumAlignment intel_alignment(_masm, 10 );
+        __ testptr(ref, Address(r15_thread, ZThreadLocalData::address_bad_mask_offset()));
+        __ jcc(Assembler::zero, good);
+    }
+    */
 }
 
 %}
