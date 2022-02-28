@@ -49,6 +49,7 @@ private:
   mutable ZConditionLock _ref_lock;
   volatile int32_t       _ref_count;
   bool                   _in_place;
+  bool                   _is_keep;
 
   ZForwardingEntry* entries() const;
   ZForwardingEntry at(ZForwardingCursor* cursor) const;
@@ -63,6 +64,8 @@ public:
 
   uint8_t type() const;
   bool keep() const;
+  bool is_keep() const;
+  void set_keep();
   uintptr_t start() const;
   size_t size() const;
   size_t object_alignment_shift() const;

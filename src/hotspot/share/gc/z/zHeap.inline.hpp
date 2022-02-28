@@ -106,6 +106,10 @@ inline uintptr_t ZHeap::alloc_object_non_blocking(size_t size) {
   return addr;
 }
 
+inline uintptr_t ZHeap::alloc_keep_object_non_blocking(size_t size) {
+    return _object_allocator.alloc_keep_object_non_blocking(size);
+}
+
 inline void ZHeap::undo_alloc_object(uintptr_t addr, size_t size) {
   ZPage* const page = _page_table.get(addr);
   _object_allocator.undo_alloc_object(page, addr, size);

@@ -353,7 +353,7 @@ void ZHeap::select_relocation_set() {
   ZRelocationSetSelector selector;
   ZPageTableIterator pt_iter(&_page_table);
   for (ZPage* page; pt_iter.next(&page);) {
-    if ((page->is_keep() && !ZDriver::KeepPermit) || !page->is_relocatable() || (!page->is_keep() && ZDriver::KeepPermit)){
+    if ((page->is_keep() && !ZDriver::KeepPermit) || !page->is_relocatable()){
       // Not relocatable, don't register
       continue;
     }
@@ -386,6 +386,8 @@ void ZHeap::select_relocation_set() {
   for (ZForwarding* forwarding; rs_iter.next(&forwarding);) {
       /*if(forwarding->keep())
           log_info(gc, heap)("reclaim Keep!!!");*/
+      if(forwarding->keep())
+          forwarding->set_keep();
     _forwarding_table.insert(forwarding);
   }
 

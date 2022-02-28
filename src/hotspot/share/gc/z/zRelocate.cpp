@@ -48,14 +48,14 @@ static uintptr_t forwarding_index(ZForwarding* forwarding, uintptr_t from_addr) 
 static uintptr_t forwarding_find(ZForwarding* forwarding, uintptr_t from_addr, ZForwardingCursor* cursor) {
   const uintptr_t from_index = forwarding_index(forwarding, from_addr);
   const ZForwardingEntry entry = forwarding->find(from_index, cursor);
-  return entry.populated() ? ZAddress::good(entry.to_offset()) : 0;
+  return entry.populated() ? (forwarding->is_keep())?ZAddress::keep(entry.to_offset()):ZAddress::good(entry.to_offset()) : 0;
 }
 
 static uintptr_t forwarding_insert(ZForwarding* forwarding, uintptr_t from_addr, uintptr_t to_addr, ZForwardingCursor* cursor) {
   const uintptr_t from_index = forwarding_index(forwarding, from_addr);
   const uintptr_t to_offset = ZAddress::offset(to_addr);
   const uintptr_t to_offset_final = forwarding->insert(from_index, to_offset, cursor);
-  return ZAddress::good(to_offset_final);
+  return (forwarding->is_keep())?ZAddress::keep(to_offset_final):ZAddress::good(to_offset_final);
 }
 
 static uintptr_t relocate_object_inner(ZForwarding* forwarding, uintptr_t from_addr, ZForwardingCursor* cursor) {
@@ -63,7 +63,7 @@ static uintptr_t relocate_object_inner(ZForwarding* forwarding, uintptr_t from_a
 
   // Allocate object
   const size_t size = ZUtils::object_size(from_addr);
-  const uintptr_t to_addr = ZHeap::heap()->alloc_object_non_blocking(size);
+  const uintptr_t to_addr = (forwarding->is_keep())?(ZAddress::keep(ZHeap::heap()->alloc_keep_object_non_blocking(size))):ZHeap::heap()->alloc_object_non_blocking(size);
   if (to_addr == 0) {
     // Allocation failed
     return 0;
@@ -128,7 +128,7 @@ static ZPage* alloc_page(const ZForwarding* forwarding) {
   ZAllocationFlags flags;
   flags.set_non_blocking();
   flags.set_worker_relocation();
-  if(ZDriver::KeepPermit)
+  if(forwarding->is_keep())
       flags.set_Keep_alloc();
   return ZHeap::heap()->alloc_page(forwarding->type(), forwarding->size(), flags);
 }
@@ -284,7 +284,12 @@ private:
 
     // Allocate object
     const size_t size = ZUtils::object_size(from_addr);
-    const uintptr_t to_addr = _allocator->alloc_object(_target, size);
+    const uintptr_t to_addr = _forwarding->is_keep()?ZAddress::keep(_allocator->alloc_object(_target, size)):_allocator->alloc_object(_target, size);
+
+    /*if(_forwarding->is_keep()){
+        int test = 0;
+        //log_info(gc, heap)("reclaim Keep!!!");
+    }*/
     if (to_addr == 0) {
       // Allocation failed
       return false;
@@ -369,6 +374,7 @@ class ZRelocateTask : public ZTask {
 private:
   ZRelocationSetParallelIterator _iter;
   ZRelocateSmallAllocator        _small_allocator;
+  ZRelocateSmallAllocator        _keep_allocator;
   ZRelocateMediumAllocator       _medium_allocator;
 
   static bool is_small(ZForwarding* forwarding) {
@@ -380,19 +386,24 @@ public:
       ZTask("ZRelocateTask"),
       _iter(relocation_set),
       _small_allocator(),
+      _keep_allocator(),
       _medium_allocator() {}
 
   ~ZRelocateTask() {
-    ZStatRelocation::set_at_relocate_end(_small_allocator.in_place_count(),
+    ZStatRelocation::set_at_relocate_end(_small_allocator.in_place_count() + _keep_allocator.in_place_count(),
                                          _medium_allocator.in_place_count());
   }
 
   virtual void work() {
     ZRelocateClosure<ZRelocateSmallAllocator> small(&_small_allocator);
+    ZRelocateClosure<ZRelocateSmallAllocator> keep(&_small_allocator);
     ZRelocateClosure<ZRelocateMediumAllocator> medium(&_medium_allocator);
 
     for (ZForwarding* forwarding; _iter.next(&forwarding);) {
-      if (is_small(forwarding)) {
+      if(forwarding->is_keep()){
+          keep.do_forwarding(forwarding);
+      }
+       else if (is_small(forwarding)) {
         small.do_forwarding(forwarding);
       } else {
         medium.do_forwarding(forwarding);

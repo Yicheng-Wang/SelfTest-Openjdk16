@@ -35,8 +35,8 @@ private:
   ZPerCPU<size_t>    _used;
   ZPerCPU<size_t>    _undone;
   ZContended<ZPage*> _shared_medium_page;
-  //ZContended<ZPage*> _shared_medium_keep_page;
-  //ZPerCPU<ZPage*>    _shared_small_keep_page;
+  ZContended<ZPage*> _shared_medium_keep_page;
+  ZPerCPU<ZPage*>    _shared_small_keep_page;
   ZPerCPU<ZPage*>    _shared_small_page;
 
   ZPage** shared_small_page_addr();
@@ -66,6 +66,7 @@ private:
   uintptr_t alloc_medium_keep_object(size_t size, ZAllocationFlags flags);
   uintptr_t alloc_small_keep_object(size_t size, ZAllocationFlags flags);
   uintptr_t alloc_small_object(size_t size, ZAllocationFlags flags);
+  uintptr_t alloc_small_share_keep_object(size_t size, ZAllocationFlags flags);
   uintptr_t alloc_object(size_t size, ZAllocationFlags flags);
 
 public:
@@ -74,6 +75,7 @@ public:
   uintptr_t alloc_object(size_t size);
   uintptr_t alloc_tklab(size_t size);
   uintptr_t alloc_object_non_blocking(size_t size);
+  uintptr_t alloc_keep_object_non_blocking(size_t size);
   void undo_alloc_object(ZPage* page, uintptr_t addr, size_t size);
 
   size_t used() const;
