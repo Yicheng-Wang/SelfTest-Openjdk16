@@ -359,8 +359,14 @@ void ZHeap::select_relocation_set() {
     }
     if (page->is_marked()) {
       // Register live page
+      if(page->is_keep()){
+          continue;
+      }
       selector.register_live_page(page);
     } else {
+        /*if(page->is_keep()){
+            log_info(gc, heap)("Release Keep Page!!!");
+        }*/
       // Register empty page
       selector.register_empty_page(page);
 
@@ -386,8 +392,8 @@ void ZHeap::select_relocation_set() {
   for (ZForwarding* forwarding; rs_iter.next(&forwarding);) {
       /*if(forwarding->keep())
           log_info(gc, heap)("reclaim Keep!!!");*/
-      if(forwarding->keep())
-          forwarding->set_keep();
+      /*if(forwarding->keep())
+          forwarding->set_keep();*/
     _forwarding_table.insert(forwarding);
   }
 

@@ -260,6 +260,18 @@ inline oop ZBarrier::load_barrier_on_oop_field(volatile oop* p) {
 }
 
 inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o) {
+    if(ZAddress::is_keep(ZOop::to_address(o))){
+        if(ZDriver::KeepPermit){
+            //ZHeap::heap()->mark_object<true, false, true>(addr);
+            load_barrier_on_oop_slow_path(ZOop::to_address(o));
+            /*ZBarrier::skipbarrier++;
+            if(ZBarrier::skipbarrier/(1024)!=(ZBarrier::skipbarrier-1)/(1024)){
+                log_info(gc, heap)("Skip Mark: " SIZE_FORMAT ,ZBarrier::skipbarrier);
+            }*/
+        }
+        return o;
+        /**/
+    }
     /*if(ZAddress::is_keep(ZOop::to_address(o))){
         ZBarrier::skipbarrier++;
         if(ZBarrier::skipbarrier/(1024*32*32)!=(ZBarrier::skipbarrier-1)/(1024*32*32)) {
@@ -454,12 +466,12 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
         if(ZDriver::KeepPermit){
             //ZHeap::heap()->mark_object<true, false, true>(addr);
             mark_barrier_on_oop_slow_path(addr);
+            /*ZBarrier::skipbarrier++;
+            if(ZBarrier::skipbarrier/(1024)!=(ZBarrier::skipbarrier-1)/(1024)){
+                log_info(gc, heap)("Skip Mark: " SIZE_FORMAT ,ZBarrier::skipbarrier);
+            }*/
         }
         return;
-        /*ZBarrier::skipbarrier++;
-        if(ZBarrier::skipbarrier/(1024*32)!=(ZBarrier::skipbarrier-1)/(1024*32)){
-            log_info(gc, heap)("Skip Mark: " SIZE_FORMAT ,ZBarrier::skipbarrier);
-        }*/
     }
     /*else{
         ZBarrier::non_skipbarrier++;

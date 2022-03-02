@@ -402,8 +402,11 @@ public:
 void ZDriver::gc(GCCause::Cause cause) {
   ZDriverGCScope scope(cause);
 
-  if(ShouldKeep)
+  if(ShouldKeep){
       ZDriver::KeepPermit = true;
+      log_info(gc, heap)("This is keep GC!");
+  }
+
 
   // Phase 1: Pause Mark Start
   pause_mark_start();
@@ -438,6 +441,7 @@ void ZDriver::gc(GCCause::Cause cause) {
   if(ZDriver::KeepPermit){
       ShouldKeep = false;
       ZDriver::KeepPermit = false;
+      log_info(gc, heap)("Should Keep now 0");
   }
 
 }
