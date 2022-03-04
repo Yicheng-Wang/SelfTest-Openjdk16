@@ -293,9 +293,9 @@ inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o)
 }
 
 inline void ZBarrier::load_barrier_on_oop_array(volatile oop* p, size_t length) {
-    if(ZAddress::is_keep(ZOop::to_address(Atomic::load(p))) && ZAddress::is_keep(ZOop::to_address(Atomic::load(p + length))) && !ZDriver::KeepPermit){
+    /*if(ZAddress::is_keep(ZOop::to_address(Atomic::load(p))) && ZAddress::is_keep(ZOop::to_address(Atomic::load(p + length))) && !ZDriver::KeepPermit){
         return;
-    }
+    }*/
   for (volatile const oop* const end = p + length; p < end; p++) {
     load_barrier_on_oop_field(p);
   }
