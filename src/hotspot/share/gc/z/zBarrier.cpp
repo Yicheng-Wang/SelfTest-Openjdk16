@@ -60,7 +60,7 @@ bool ZBarrier::should_mark_through(uintptr_t addr) {
   // since such oops can never end up on a mutator mark stack and can
   // therefore not hide some part of the object graph from GC workers.
   if (finalizable) {
-    return !ZAddress::is_marked(addr) || ZAddress::is_keep(addr);
+    return !ZAddress::is_marked(addr);
   }
 
   // Mark through
@@ -116,9 +116,9 @@ uintptr_t ZBarrier::remap(uintptr_t addr) {
 }
 
 uintptr_t ZBarrier::relocate(uintptr_t addr) {
-  assert(!ZAddress::is_good(addr) || ZAddress::is_keep(addr), "Should not be good");
-  assert(!ZAddress::is_weak_good(addr) || ZAddress::is_keep(addr), "Should not be weak good");
-  return ZAddress::is_keep(addr)?addr:ZHeap::heap()->relocate_object(addr);
+  assert(!ZAddress::is_good(addr), "Should not be good");
+  assert(!ZAddress::is_weak_good(addr), "Should not be weak good");
+  return ZHeap::heap()->relocate_object(addr);
 }
 
 uintptr_t ZBarrier::relocate_or_mark(uintptr_t addr) {

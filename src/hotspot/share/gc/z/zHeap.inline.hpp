@@ -65,6 +65,16 @@ inline bool ZHeap::is_object_live(uintptr_t addr) const {
   return page->is_object_live(addr);
 }
 
+inline bool ZHeap::page_is_marked(uintptr_t addr) const {
+    ZPage* page = _page_table.get(addr);
+    bool result = page->is_allocating()?true:page->is_marked();
+    if(result) {
+        bool check = page->is_allocating();
+        //log_info(gc, heap)("No need!");
+    }
+    return result;
+}
+
 inline bool ZHeap::is_object_strongly_live(uintptr_t addr) const {
   ZPage* page = _page_table.get(addr);
   return page->is_object_strongly_live(addr);

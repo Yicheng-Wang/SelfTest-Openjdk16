@@ -125,6 +125,7 @@ public:
 
   // Marking
   bool is_object_live(uintptr_t addr) const;
+  bool page_is_marked(uintptr_t addr) const;
   bool is_object_strongly_live(uintptr_t addr) const;
   template <bool follow, bool finalizable, bool publish> void mark_object(uintptr_t addr);
   void mark_start();

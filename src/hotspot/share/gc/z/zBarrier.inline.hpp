@@ -260,18 +260,17 @@ inline oop ZBarrier::load_barrier_on_oop_field(volatile oop* p) {
 }
 
 inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o) {
-    if(ZAddress::is_keep(ZOop::to_address(o))){
-        if(ZDriver::KeepPermit){
+    /*const uintptr_t addr = ZOop::to_address(o);
+    if(ZAddress::is_keep(addr)){
+        if(ZDriver::KeepPermit && during_mark()){
             //ZHeap::heap()->mark_object<true, false, true>(addr);
-            load_barrier_on_oop_slow_path(ZOop::to_address(o));
-            /*ZBarrier::skipbarrier++;
-            if(ZBarrier::skipbarrier/(1024)!=(ZBarrier::skipbarrier-1)/(1024)){
-                log_info(gc, heap)("Skip Mark: " SIZE_FORMAT ,ZBarrier::skipbarrier);
-            }*/
+            if(!ZHeap::heap()->page_is_marked(addr)){
+                bool what = false;
+            }
+            mark_barrier_on_oop_slow_path(addr);
         }
         return o;
-        /**/
-    }
+    }*/
     /*if(ZAddress::is_keep(ZOop::to_address(o))){
         ZBarrier::skipbarrier++;
         if(ZBarrier::skipbarrier/(1024*32*32)!=(ZBarrier::skipbarrier-1)/(1024*32*32)) {
@@ -294,6 +293,9 @@ inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o)
 }
 
 inline void ZBarrier::load_barrier_on_oop_array(volatile oop* p, size_t length) {
+    if(ZAddress::is_keep(ZOop::to_address(Atomic::load(p))) && ZAddress::is_keep(ZOop::to_address(Atomic::load(p + length))) && !ZDriver::KeepPermit){
+        return;
+    }
   for (volatile const oop* const end = p + length; p < end; p++) {
     load_barrier_on_oop_field(p);
   }
@@ -462,15 +464,17 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
     barrier<is_marked_or_null_fast_path, mark_barrier_on_finalizable_oop_slow_path>(p, o);
   } else {
     const uintptr_t addr = ZOop::to_address(o);
-    if(ZAddress::is_keep(addr)){
-        if(ZDriver::KeepPermit){
+    if(ZAddress::is_keep(addr) && !ZDriver::KeepPermit){
+        /*if(ZDriver::KeepPermit){
             //ZHeap::heap()->mark_object<true, false, true>(addr);
+            if(ZHeap::heap()->page_is_marked(addr))
+                return;
             mark_barrier_on_oop_slow_path(addr);
             /*ZBarrier::skipbarrier++;
             if(ZBarrier::skipbarrier/(1024)!=(ZBarrier::skipbarrier-1)/(1024)){
                 log_info(gc, heap)("Skip Mark: " SIZE_FORMAT ,ZBarrier::skipbarrier);
-            }*/
-        }
+            }
+        }*/
         return;
     }
     /*else{
@@ -491,7 +495,10 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
 }
 
 inline void ZBarrier::mark_barrier_on_oop_array(volatile oop* p, size_t length, bool finalizable) {
-  for (volatile const oop* const end = p + length; p < end; p++) {
+    if(ZAddress::is_keep(ZOop::to_address(Atomic::load(p))) && ZAddress::is_keep(ZOop::to_address(Atomic::load(p + length))) && !ZDriver::KeepPermit){
+        return;
+    }
+    for (volatile const oop* const end = p + length; p < end; p++) {
     mark_barrier_on_oop_field(p, finalizable);
   }
 }
