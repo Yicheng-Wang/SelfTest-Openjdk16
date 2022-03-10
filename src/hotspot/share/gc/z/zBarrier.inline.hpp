@@ -271,14 +271,20 @@ inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o)
         }
         return o;
     }*/
-    /*if(ZAddress::is_keep(ZOop::to_address(o))){
+    if(ZAddress::is_keep(ZOop::to_address(o))){
         ZBarrier::skipbarrier++;
-        if(ZBarrier::skipbarrier/(1024*32*32)!=(ZBarrier::skipbarrier-1)/(1024*32*32)) {
-            log_info(gc, heap)("Skip Load: " SIZE_FORMAT, ZBarrier::skipbarrier);
+        if(ZBarrier::skipbarrier/(1024*32*4)!=(ZBarrier::skipbarrier-1)/(1024*32*4)) {
+            log_info(gc, heap)("Skip Keep: " SIZE_FORMAT, ZBarrier::skipbarrier);
         }
         return o;
         //log_info(gc, heap)("Skip Load");
-    }*/
+    }
+    else{
+        ZBarrier::non_skipbarrier++;
+        if(ZBarrier::non_skipbarrier/(1024*32*32)!=(ZBarrier::non_skipbarrier-1)/(1024*32*32)) {
+            log_info(gc, heap)("Non Skip Load: " SIZE_FORMAT, ZBarrier::non_skipbarrier);
+        }
+    }
     /*else{
         ZBarrier::non_skipbarrier++;
         if(ZBarrier::non_skipbarrier/(1024*1024*64)!=(ZBarrier::non_skipbarrier-1)/(1024*1024*64)) {
@@ -495,9 +501,9 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
 }
 
 inline void ZBarrier::mark_barrier_on_oop_array(volatile oop* p, size_t length, bool finalizable) {
-    if(ZAddress::is_keep(ZOop::to_address(Atomic::load(p))) && ZAddress::is_keep(ZOop::to_address(Atomic::load(p + length))) && !ZDriver::KeepPermit){
+    /*if(ZAddress::is_keep(ZOop::to_address(Atomic::load(p))) && ZAddress::is_keep(ZOop::to_address(Atomic::load(p + length))) && !ZDriver::KeepPermit){
         return;
-    }
+    }*/
     for (volatile const oop* const end = p + length; p < end; p++) {
     mark_barrier_on_oop_field(p, finalizable);
   }
