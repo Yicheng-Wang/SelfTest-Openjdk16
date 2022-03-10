@@ -38,6 +38,7 @@ void ZAddress::initialize() {
 
   ZAddressMetadataShift = ZPlatformAddressMetadataShift();
   ZAddressMetadataMask = (((uintptr_t)1 << ZAddressMetadataBits) - 1) << ZAddressMetadataShift;
+  ZAddressFullMask = (((uintptr_t)1 << ZAddressMetadataBits + ZAddressMetadataShift) - 1);
 
   ZAddressMetadataMarked0 = (uintptr_t)1 << (ZAddressMetadataShift + 0);
   ZAddressMetadataMarked1 = (uintptr_t)1 << (ZAddressMetadataShift + 1);

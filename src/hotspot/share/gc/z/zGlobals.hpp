@@ -112,6 +112,7 @@ extern size_t     ZAddressOffsetMax;
 const size_t      ZAddressMetadataBits          = 4;
 extern size_t     ZAddressMetadataShift;
 extern uintptr_t  ZAddressMetadataMask;
+extern uintptr_t  ZAddressFullMask;
 
 // Metadata types
 extern uintptr_t  ZAddressMetadataMarked;

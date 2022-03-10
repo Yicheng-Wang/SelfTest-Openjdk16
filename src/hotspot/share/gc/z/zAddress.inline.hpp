@@ -31,9 +31,6 @@
 #include "utilities/powerOfTwo.hpp"
 
 inline bool ZAddress::is_null(uintptr_t value) {
-  bool result = (value == 0);
-  if(result)
-      return result;
   return value == 0;
 }
 

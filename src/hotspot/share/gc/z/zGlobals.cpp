@@ -56,6 +56,7 @@ size_t     ZAddressOffsetMax;
 
 size_t     ZAddressMetadataShift;
 uintptr_t  ZAddressMetadataMask;
+uintptr_t  ZAddressFullMask;
 
 uintptr_t  ZAddressMetadataMarked;
 uintptr_t  ZAddressMetadataMarked0;

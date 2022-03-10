@@ -119,6 +119,9 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
   //__ jcc(Assembler::greaterEqual, done);
 
   // Test address bad mask
+  __ testptr(dst, ZAddressFullMask);
+  __ jcc(Assembler::zero, done);
+
   __ testptr(dst, address_keep_mask_from_thread(r15_thread));
   __ jcc(Assembler::notZero, done);
 
@@ -299,7 +302,7 @@ void ZBarrierSetAssembler::generate_c1_load_barrier_test(LIR_Assembler* ce,
 
 void ZBarrierSetAssembler::generate_c1_load_barrier_keep_test(LIR_Assembler* ce,
                                                          LIR_Opr ref) const {
-  __ cmpptr(ref->as_register(), address_keep_mask_from_thread(r15_thread));
+  __ testptr(ref->as_register(), ZAddressFullMask);
 }
 
 
