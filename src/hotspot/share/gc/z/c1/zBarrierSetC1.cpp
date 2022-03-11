@@ -177,8 +177,8 @@ void ZBarrierSetC1::load_barrier(LIRAccess& access, LIR_Opr result) const {
   CodeStub* const stub = new ZLoadBarrierStubC1(access, result, runtime_stub);
 
 
-  __ append(new LIR_OpZLoadBarrierKeepTest(result));
-  __ branch(lir_cond_equal, stub->continuation());
+  //__ append(new LIR_OpZLoadBarrierKeepTest(result));
+  //__ branch(lir_cond_equal, stub->continuation());
 
   __ append(new LIR_OpZLoadBarrierTest(result));
   // Slow path
