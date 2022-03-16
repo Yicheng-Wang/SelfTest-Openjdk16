@@ -505,11 +505,7 @@ JVM_ENTRY_NO_ENV(void, JVM_GC(void))
 JVM_END
 
 JVM_ENTRY_NO_ENV(void, JVM_SetKeep(void))
-    log_info(gc, heap)("ShouldKeep is %d", ShouldKeep);
-  if (!ShouldKeep) {
       ShouldKeep = true;
-  }
-    log_info(gc, heap)("ShouldKeep is changed to %d", ShouldKeep);
 JVM_END
 
 

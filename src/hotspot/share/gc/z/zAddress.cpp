@@ -27,31 +27,35 @@
 
 void ZAddress::set_good_mask(uintptr_t mask) {
   ZAddressGoodMask = mask;
-  ZAddressBadMask = ZAddressGoodMask ^ ZAddressMetadataMask;
-  ZAddressWeakBadMask = (ZAddressGoodMask | ZAddressMetadataRemapped | ZAddressMetadataFinalizable) ^ ZAddressMetadataMask;
+  ZAddressbetterMask = ZAddressGoodMask | ZAddressKeepMask;
+  ZAddressBadMask = (ZAddressGoodMask | ZAddressKeepMask)^ ZAddressMetadataMask;
+  ZAddressWeakBadMask = (ZAddressGoodMask | ZAddressMetadataRemapped | ZAddressMetadataFinalizable | ZAddressKeepMask) ^ ZAddressMetadataMask;
 }
 
 void ZAddress::initialize() {
-  ZAddressOffsetBits = ZPlatformAddressOffsetBits();
+  ZAddressOffsetBits = ZPlatformAddressOffsetBits() - 1;
   ZAddressOffsetMask = (((uintptr_t)1 << ZAddressOffsetBits) - 1) << ZAddressOffsetShift;
   ZAddressOffsetMax = (uintptr_t)1 << ZAddressOffsetBits;
 
-  ZAddressMetadataShift = ZPlatformAddressMetadataShift();
+  ZAddressMetadataShift = ZPlatformAddressMetadataShift() - 1;
   ZAddressMetadataMask = (((uintptr_t)1 << ZAddressMetadataBits) - 1) << ZAddressMetadataShift;
   ZAddressFullMask = (((uintptr_t)1 << ZAddressMetadataBits + ZAddressMetadataShift) - 1);
 
   ZAddressMetadataMarked0 = (uintptr_t)1 << (ZAddressMetadataShift + 0);
   ZAddressMetadataMarked1 = (uintptr_t)1 << (ZAddressMetadataShift + 1);
   ZAddressMetadataRemapped = (uintptr_t)1 << (ZAddressMetadataShift + 2);
-  ZAddressMetadataFinalizable = (uintptr_t)1 << (ZAddressMetadataShift + 3);
+  ZAddressKeepMask = (uintptr_t)1 << (ZAddressMetadataShift + 3);
+  ZAddressMetadataFinalizable = (uintptr_t)1 << (ZAddressMetadataShift + 4);
+
 
   ZAddressMetadataMarked = ZAddressMetadataMarked0;
-  ZAddressKeepMask = (uintptr_t)7 << (ZAddressMetadataShift + 0);
+  //ZAddressKeepMask = (uintptr_t)7 << (ZAddressMetadataShift + 0);
   set_good_mask(ZAddressMetadataRemapped);
 }
 
 void ZAddress::flip_to_marked() {
   ZAddressMetadataMarked ^= (ZAddressMetadataMarked0 | ZAddressMetadataMarked1);
+  ZAddressMetadataKeepMarked = ZAddressMetadataMarked | ZAddressKeepMask;
   set_good_mask(ZAddressMetadataMarked);
 }
 

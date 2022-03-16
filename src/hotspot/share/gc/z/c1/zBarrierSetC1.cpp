@@ -182,7 +182,7 @@ void ZBarrierSetC1::load_barrier(LIRAccess& access, LIR_Opr result) const {
 
   __ append(new LIR_OpZLoadBarrierTest(result));
   // Slow path
-  __ branch(lir_cond_equal, stub);
+  __ branch(lir_cond_notEqual, stub);
 
   __ branch_destination(stub->continuation());
 }

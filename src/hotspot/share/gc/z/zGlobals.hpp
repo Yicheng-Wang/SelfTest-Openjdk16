@@ -91,6 +91,7 @@ const int         ZObjectAlignmentLarge         = 1 << ZObjectAlignmentLargeShif
 
 // Good/bad masks
 extern uintptr_t  ZAddressGoodMask;
+extern uintptr_t  ZAddressbetterMask;
 extern uintptr_t  ZAddressBadMask;
 extern uintptr_t  ZAddressWeakBadMask;
 extern uintptr_t  ZAddressKeepMask;
@@ -109,13 +110,14 @@ extern uintptr_t  ZAddressOffsetMask;
 extern size_t     ZAddressOffsetMax;
 
 // Metadata part of address
-const size_t      ZAddressMetadataBits          = 4;
+const size_t      ZAddressMetadataBits          = 5;
 extern size_t     ZAddressMetadataShift;
 extern uintptr_t  ZAddressMetadataMask;
 extern uintptr_t  ZAddressFullMask;
 
 // Metadata types
 extern uintptr_t  ZAddressMetadataMarked;
+extern uintptr_t  ZAddressMetadataKeepMarked;
 extern uintptr_t  ZAddressMetadataMarked0;
 extern uintptr_t  ZAddressMetadataMarked1;
 extern uintptr_t  ZAddressMetadataRemapped;

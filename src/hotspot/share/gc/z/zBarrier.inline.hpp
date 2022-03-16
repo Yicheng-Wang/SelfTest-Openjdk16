@@ -232,7 +232,7 @@ inline bool ZBarrier::is_not_keep_fast_path(uintptr_t addr) {
 }
 
 inline bool ZBarrier::is_weak_good_or_null_fast_path(uintptr_t addr) {
-  return ZAddress::is_weak_good_or_null(addr) || ZAddress::is_keep(addr);
+  return ZAddress::is_weak_good_or_null(addr);
 }
 
 inline bool ZBarrier::is_marked_or_null_fast_path(uintptr_t addr) {
@@ -470,7 +470,7 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
     barrier<is_marked_or_null_fast_path, mark_barrier_on_finalizable_oop_slow_path>(p, o);
   } else {
     const uintptr_t addr = ZOop::to_address(o);
-    if(ZAddress::is_keep(addr)){
+    if(ZAddress::is_keep(addr) && !ZDriver::KeepPermit){
         /*if(ZDriver::KeepPermit){
             //ZHeap::heap()->mark_object<true, false, true>(addr);
             if(ZHeap::heap()->page_is_marked(addr))

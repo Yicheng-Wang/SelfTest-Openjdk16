@@ -39,6 +39,8 @@ const int& ZObjectAlignmentSmall       = MinObjAlignmentInBytes;
 int        ZObjectAlignmentMedium;
 
 uintptr_t  ZAddressGoodMask;
+uintptr_t  ZAddressbetterMask;
+uintptr_t  ZAddressMetadataKeepMarked;
 uintptr_t  ZAddressBadMask;
 uintptr_t  ZAddressWeakBadMask;
 uintptr_t  ZAddressKeepMask;

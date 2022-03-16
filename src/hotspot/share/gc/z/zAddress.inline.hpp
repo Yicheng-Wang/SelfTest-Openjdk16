@@ -35,15 +35,15 @@ inline bool ZAddress::is_null(uintptr_t value) {
 }
 
 inline bool ZAddress::is_bad(uintptr_t value) {
-  return !is_good(value);
+  return value & ZAddressBadMask;
 }
 
 inline bool ZAddress::is_good(uintptr_t value) {
-  return value & ZAddressGoodMask;
+  return value & ZAddressbetterMask;
 }
 
 inline bool ZAddress::is_keep(uintptr_t value) {
-    return ! (value & ZAddressMetadataMask ^ ZAddressKeepMask);
+    return value & ZAddressKeepMask;
 }
 
 inline bool ZAddress::is_good_or_null(uintptr_t value) {
@@ -56,7 +56,7 @@ inline bool ZAddress::is_good_or_null(uintptr_t value) {
   // addresses should ever be passed through the barrier.
   //const bool result = is_good(value) || is_null(value);
   //assert((is_good(value) || is_null(value)) == result, "Bad address");
-  return is_good(value) || is_null(value);
+  return !is_bad(value);
 }
 
 inline bool ZAddress::is_weak_bad(uintptr_t value) {
@@ -72,7 +72,7 @@ inline bool ZAddress::is_weak_good_or_null(uintptr_t value) {
 }
 
 inline bool ZAddress::is_marked(uintptr_t value) {
-  return value & ZAddressMetadataMarked;
+  return value & ZAddressMetadataKeepMarked;
 }
 
 inline bool ZAddress::is_marked_or_null(uintptr_t value) {
