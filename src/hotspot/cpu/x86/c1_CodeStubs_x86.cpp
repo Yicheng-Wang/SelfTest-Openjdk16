@@ -191,7 +191,8 @@ NewInstanceStub::NewInstanceStub(LIR_Opr klass_reg, LIR_Opr result, ciInstanceKl
   _info = new CodeEmitInfo(info);
   assert(stub_id == Runtime1::new_instance_id                 ||
          stub_id == Runtime1::fast_new_instance_id            ||
-         stub_id == Runtime1::fast_new_instance_init_check_id,
+         stub_id == Runtime1::fast_new_instance_init_check_id ||
+         stub_id == Runtime1::new_keep_instance_id,
          "need new_instance id");
   _stub_id   = stub_id;
 }

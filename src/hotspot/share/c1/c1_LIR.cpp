@@ -1290,7 +1290,7 @@ void LIR_List::cmp_reg_mem(LIR_Condition condition, LIR_Opr reg, LIR_Address* ad
 }
 
 void LIR_List::allocate_object(LIR_Opr dst, LIR_Opr t1, LIR_Opr t2, LIR_Opr t3, LIR_Opr t4,
-                               int header_size, int object_size, LIR_Opr klass, bool init_check, CodeStub* stub) {
+                               int header_size, int object_size, LIR_Opr klass, bool init_check, CodeStub* stub, int alloc_gen) {
   append(new LIR_OpAllocObj(
                            klass,
                            dst,
@@ -1301,7 +1301,8 @@ void LIR_List::allocate_object(LIR_Opr dst, LIR_Opr t1, LIR_Opr t2, LIR_Opr t3, 
                            header_size,
                            object_size,
                            init_check,
-                           stub));
+                           stub,
+                           alloc_gen));
 }
 
 void LIR_List::allocate_array(LIR_Opr dst, LIR_Opr len, LIR_Opr t1,LIR_Opr t2, LIR_Opr t3,LIR_Opr t4, BasicType type, LIR_Opr klass, CodeStub* stub, int alloc_gen) {
