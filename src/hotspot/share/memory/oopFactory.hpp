@@ -54,6 +54,7 @@ class oopFactory: AllStatic {
   static typeArrayOop    new_symbolArray(int length, TRAPS);
 
   // Regular object arrays
+  static objArrayOop     new_objArray(int alloc_gen, Klass* klass, int length, TRAPS);
   static objArrayOop     new_objArray(Klass* klass, int length, TRAPS);
 
   // Helper that returns a Handle

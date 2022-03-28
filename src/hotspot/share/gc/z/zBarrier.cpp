@@ -78,6 +78,9 @@ bool ZBarrier::should_mark_through(uintptr_t addr) {
 template <bool follow, bool finalizable, bool publish>
 uintptr_t ZBarrier::mark(uintptr_t addr) {
   uintptr_t good_addr;
+  /*if(ZAddress::is_keep(addr)){
+      int i=0;
+  }*/
   //assert(!ZAddress::is_keep(addr),"Not mark Keep");
   if (ZAddress::is_marked(addr)) {
     // Already marked, but try to mark though anyway
@@ -137,6 +140,9 @@ uintptr_t ZBarrier::relocate_or_remap(uintptr_t addr) {
 // Load barrier
 //
 uintptr_t ZBarrier::load_barrier_on_oop_slow_path(uintptr_t addr) {
+    /*if(ZAddress::is_keep(addr)){
+        int i=0;
+    }*/
   return relocate_or_mark(addr);
 }
 
@@ -205,6 +211,9 @@ uintptr_t ZBarrier::mark_barrier_on_oop_slow_path(uintptr_t addr) {
 uintptr_t ZBarrier::mark_barrier_on_finalizable_oop_slow_path(uintptr_t addr) {
   assert(during_mark(), "Invalid phase");
 
+    /*if(ZAddress::is_keep(addr) && !ZDriver::KeepPermit){
+        int i = 0;
+    }*/
   // Mark
   return mark<Follow, Finalizable, Overflow>(addr);
 }

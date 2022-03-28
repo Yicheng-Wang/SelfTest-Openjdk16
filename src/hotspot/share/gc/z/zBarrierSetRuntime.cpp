@@ -43,6 +43,8 @@ JRT_LEAF(oopDesc*, ZBarrierSetRuntime::load_barrier_on_oop_field_preloaded(oopDe
             log_info(gc, heap)("Null load: " SIZE_FORMAT, ZBarrier::non_skipweakbarrier);
         }
     }*/
+    /*if(o->klass_or_null() == NULL)
+        return o;*/
   return ZBarrier::load_barrier_on_oop_field_preloaded(p, o);
 JRT_END
 

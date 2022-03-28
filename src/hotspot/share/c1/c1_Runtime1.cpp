@@ -457,6 +457,24 @@ JRT_ENTRY(void, Runtime1::new_object_array(JavaThread* thread, Klass* array_klas
   }
 JRT_END
 
+JRT_ENTRY(void, Runtime1::new_keep_object_array(JavaThread* thread, Klass* array_klass, jint length))
+    NOT_PRODUCT(_new_object_array_slowcase_cnt++;)
+
+    // Note: no handle for klass needed since they are not used
+    //       anymore after new_objArray() and no GC can happen before.
+    //       (This may have to change if this code changes!)
+    assert(array_klass->is_klass(), "not a class");
+    Handle holder(THREAD, array_klass->klass_holder()); // keep the klass alive
+    Klass* elem_klass = ObjArrayKlass::cast(array_klass)->element_klass();
+    objArrayOop obj = oopFactory::new_objArray(1, elem_klass, length, CHECK);
+    thread->set_vm_result(obj);
+    // This is pretty rare but this runtime patch is stressful to deoptimization
+    // if we deoptimize here so force a deopt to stress the path.
+    if (DeoptimizeALot) {
+        deopt_caller();
+    }
+JRT_END
+
 
 JRT_ENTRY(void, Runtime1::new_multi_array(JavaThread* thread, Klass* klass, int rank, jint* dims))
   NOT_PRODUCT(_new_multi_array_slowcase_cnt++;)

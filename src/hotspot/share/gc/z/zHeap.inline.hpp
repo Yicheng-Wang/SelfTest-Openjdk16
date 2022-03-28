@@ -42,13 +42,13 @@ inline ReferenceDiscoverer* ZHeap::reference_discoverer() {
   return &_reference_processor;
 }
 
-/*inline bool ZHeap::is_object_in_keep(uintptr_t addr){
+inline bool ZHeap::is_object_in_keep(uintptr_t addr){
     ZPage* page = _page_table.get(addr);
     if(page->is_keep())
         return true;
     else
         return false;
-}*/
+}
 
 /*inline void ZHeap::setDirect(uintptr_t addr){
     ZPage* page = _page_table.get(addr);

@@ -347,6 +347,28 @@ class NewObjectArrayStub: public CodeStub {
 #endif // PRODUCT
 };
 
+class NewObjectKeepArrayStub: public CodeStub {
+private:
+    LIR_Opr        _klass_reg;
+    LIR_Opr        _length;
+    LIR_Opr        _result;
+    CodeEmitInfo*  _info;
+    int _alloc_gen;
+
+public:
+    NewObjectKeepArrayStub(LIR_Opr klass_reg, LIR_Opr length, LIR_Opr result, CodeEmitInfo* info, int alloc_gen);
+    virtual void emit_code(LIR_Assembler* e);
+    virtual CodeEmitInfo* info() const             { return _info; }
+    virtual void visit(LIR_OpVisitState* visitor) {
+        visitor->do_slow_case(_info);
+        visitor->do_input(_klass_reg);
+        visitor->do_input(_length);
+        assert(_result->is_valid(), "must be valid"); visitor->do_output(_result);
+    }
+#ifndef PRODUCT
+    virtual void print_name(outputStream* out) const { out->print("NewObjectArrayStub"); }
+#endif // PRODUCT
+};
 
 class MonitorAccessStub: public CodeStub {
  protected:

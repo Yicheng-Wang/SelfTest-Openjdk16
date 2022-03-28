@@ -171,6 +171,9 @@ inline oop ZBarrier::barrier(volatile oop* p, oop o) {
   // Slow path
   const uintptr_t good_addr = slow_path(addr);
 
+  /*if(ZAddress::is_keep(addr)){
+      int i = 0;
+  }*/
   if (p != NULL) {
     self_heal<fast_path>(p, addr, good_addr);
   }
@@ -191,6 +194,10 @@ inline oop ZBarrier::weak_barrier(volatile oop* p, oop o) {
 
   // Slow path
   const uintptr_t good_addr = slow_path(addr);
+
+  /*if(ZAddress::is_keep(addr)){
+      int i = 0;
+  }*/
 
   if (p != NULL) {
     // The slow path returns a good/marked address or null, but we never mark
@@ -262,12 +269,11 @@ inline oop ZBarrier::load_barrier_on_oop_field(volatile oop* p) {
 inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o) {
     /*const uintptr_t addr = ZOop::to_address(o);
     if(ZAddress::is_keep(addr)){
-        if(ZDriver::KeepPermit && during_mark()){
+        if(ZDriver::KeepPermit){
             //ZHeap::heap()->mark_object<true, false, true>(addr);
             if(!ZHeap::heap()->page_is_marked(addr)){
-                bool what = false;
+                mark_barrier_on_oop_slow_path(addr);
             }
-            mark_barrier_on_oop_slow_path(addr);
         }
         return o;
     }*/
@@ -295,6 +301,13 @@ inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o)
     if(ZBarrier::non_skipbarrier/(1024)!=(ZBarrier::non_skipbarrier-1)/(1024)) {
         log_info(gc, heap)("Not Jump Load: " SIZE_FORMAT, ZBarrier::non_skipbarrier);
     }*/
+    /*char* name = (char*)malloc(30);
+      if(o!=NULL && o->is_instance()){
+          InstanceKlass* get_class = (InstanceKlass*)o->klass();
+          ConstantPool* pool = get_class->constants();
+          name = (char*)malloc(30);
+          pool->klass_name_at(get_class->this_class_index())->as_C_string(name,30);
+      }*/
   return barrier<is_good_or_null_fast_path, load_barrier_on_oop_slow_path>(p, o);
 }
 
@@ -370,6 +383,18 @@ inline oop ZBarrier::weak_load_barrier_on_oop_field_preloaded(volatile oop* p, o
         if(ZBarrier::non_skipweakbarrier/(1024*256)!=(ZBarrier::non_skipweakbarrier-1)/(1024*256)){
             log_info(gc, heap)("None Jump Weak Mark: " SIZE_FORMAT ,ZBarrier::non_skipweakbarrier);
         }
+    }*/
+    /*const uintptr_t addr = ZOop::to_address(o);
+    if(ZAddress::is_keep(addr) && !ZDriver::KeepPermit){
+        if(o->is_instance()){
+            InstanceKlass* get_class = (InstanceKlass*)o->klass();
+            ConstantPool* pool = get_class->constants();
+            char* name = (char*)malloc(30);
+            pool->klass_name_at(get_class->this_class_index())->as_C_string(name,30);
+            int i = 0;
+            free(name);
+        }
+        int i = 0;
     }*/
   return weak_barrier<is_weak_good_or_null_fast_path, weak_load_barrier_on_oop_slow_path>(p, o);
 }

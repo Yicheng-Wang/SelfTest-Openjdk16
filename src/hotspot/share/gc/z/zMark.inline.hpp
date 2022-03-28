@@ -37,7 +37,10 @@ inline void ZMark::mark_object(uintptr_t addr) {
   ZMarkThreadLocalStacks* const stacks = ZThreadLocalData::stacks(Thread::current());
   ZMarkStripe* const stripe = _stripes.stripe_for_addr(addr);
   ZMarkStackEntry entry(addr, follow, finalizable);
-
+  //assert(!_page_table->get(addr)->is_keep(), "Should not keep");
+  /*if(_page_table->get(addr)->is_keep()){
+      return;
+  }*/
   stacks->push(&_allocator, &_stripes, stripe, entry, publish);
 }
 

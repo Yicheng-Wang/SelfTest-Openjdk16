@@ -206,12 +206,12 @@ void C1_MacroAssembler::initialize_body(Register obj, Register len_in_bytes, int
 }
 
 
-void C1_MacroAssembler::allocate_object(Register obj, Register t1, Register t2, int header_size, int object_size, Register klass, Label& slow_case) {
+void C1_MacroAssembler::allocate_object(Register obj, Register t1, Register t2, int header_size, int object_size, Register klass, Label& slow_case, int alloc_gen) {
   assert(obj == rax, "obj must be in rax, for cmpxchg");
   assert_different_registers(obj, t1, t2); // XXX really?
   assert(header_size >= 0 && object_size >= header_size, "illegal sizes");
 
-  try_allocate(obj, noreg, object_size * BytesPerWord, t1, t2, slow_case ,0);
+  try_allocate(obj, noreg, object_size * BytesPerWord, t1, t2, slow_case ,alloc_gen);
 
   initialize_object(obj, klass, noreg, object_size * HeapWordSize, t1, t2, UseTLAB);
 }

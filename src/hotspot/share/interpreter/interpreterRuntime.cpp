@@ -265,7 +265,7 @@ int InterpreterRuntime::get_alloc_gen(JavaThread* thread, int n_dims = 0) {
             u2 anno_type_index = Bytes::get_Java_u2(data + 4 + dsize*2);
             // Get char* (type name, should be Ljava/lang/Gen;)
             Symbol* type_name = pool->symbol_at(anno_type_index);
-
+            // char* real_name = type_name->as_C_string();
             // Note: If anno_bco == bci, then they both point to the same bc. In this
             // situation there is no need to fix the bci. Only if they differ, we
             // should look into the size of make sure that both bcis are a match.
@@ -278,6 +278,7 @@ int InterpreterRuntime::get_alloc_gen(JavaThread* thread, int n_dims = 0) {
 
             if (anno_target == 68 && (anno_bci+anno_bc_len) == bci && type_name->equals("Ljava/lang/Keep;", 16)) {
                 aac->at_put(next_centry, bci); // Storing in cache.
+                //log_info(gc, heap)("New First Time");
                 return 1;
             }
             // <underscore> 8 is the number of bytes used a alloc annotation.
@@ -317,6 +318,10 @@ JRT_ENTRY(void, InterpreterRuntime::_new(JavaThread* thread, ConstantPool* pool,
       log_info(gc, heap)("Interpreter Keep Alloc Object");
   }*/
   oop obj = klass->allocate_instance(alloc_gen, CHECK);
+    /*if(alloc_gen>0){
+        int i=0;
+        //log_info(gc, heap)("Interpreter Keep Alloc Object");
+    }*/
   //oop obj = klass->allocate_instance(CHECK);
   thread->set_vm_result(obj);
 JRT_END
@@ -334,13 +339,20 @@ JRT_ENTRY(void, InterpreterRuntime::newarray(JavaThread* thread, BasicType type,
       log_info(gc, heap)("Interpreter Keep Alloc Array ");
   }*/
   oop obj = oopFactory::new_typeArray(alloc_gen, type, size, CHECK);
+    /*if(alloc_gen>0){
+        int i=0;
+    }*/
   thread->set_vm_result(obj);
 JRT_END
 
 
 JRT_ENTRY(void, InterpreterRuntime::anewarray(JavaThread* thread, ConstantPool* pool, int index, jint size))
-  Klass*    klass = pool->klass_at(index, CHECK);
-  objArrayOop obj = oopFactory::new_objArray(klass, size, CHECK);
+  int alloc_gen = get_alloc_gen(thread,1);
+  Klass* klass = pool->klass_at(index, CHECK);
+  objArrayOop obj = oopFactory::new_objArray(alloc_gen, klass, size, CHECK);
+    /*if(alloc_gen>0){
+        int i =0;
+    }*/
   thread->set_vm_result(obj);
 JRT_END
 

@@ -191,7 +191,8 @@ NewInstanceStub::NewInstanceStub(LIR_Opr klass_reg, LIR_Opr result, ciInstanceKl
   _info = new CodeEmitInfo(info);
   assert(stub_id == Runtime1::new_instance_id                 ||
          stub_id == Runtime1::fast_new_instance_id            ||
-         stub_id == Runtime1::fast_new_instance_init_check_id,
+         stub_id == Runtime1::fast_new_instance_init_check_id ||
+         stub_id == Runtime1::new_keep_instance_id,
          "need new_instance id");
   _stub_id   = stub_id;
 }
@@ -263,6 +264,14 @@ NewObjectArrayStub::NewObjectArrayStub(LIR_Opr klass_reg, LIR_Opr length, LIR_Op
 }
 
 
+NewObjectKeepArrayStub::NewObjectKeepArrayStub(LIR_Opr klass_reg, LIR_Opr length, LIR_Opr result, CodeEmitInfo* info, int alloc_gen) {
+    _klass_reg = klass_reg;
+    _length = length;
+    _result = result;
+    _info = new CodeEmitInfo(info);
+    _alloc_gen = alloc_gen;
+}
+
 void NewObjectArrayStub::emit_code(LIR_Assembler* ce) {
   assert(__ rsp_offset() == 0, "frame size should be fixed");
   __ bind(_entry);
@@ -275,7 +284,17 @@ void NewObjectArrayStub::emit_code(LIR_Assembler* ce) {
   __ jmp(_continuation);
 }
 
-
+void NewObjectKeepArrayStub::emit_code(LIR_Assembler* ce) {
+    assert(__ rsp_offset() == 0, "frame size should be fixed");
+    __ bind(_entry);
+    assert(_length->as_register() == rbx, "length must in rbx,");
+    assert(_klass_reg->as_register() == rdx, "klass_reg must in rdx");
+    __ call(RuntimeAddress(Runtime1::entry_for(Runtime1::new_keep_object_array_id)));
+    ce->add_call_info_here(_info);
+    ce->verify_oop_map(_info);
+    assert(_result->as_register() == rax, "result must in rax,");
+    __ jmp(_continuation);
+}
 // Implementation of MonitorAccessStubs
 
 MonitorEnterStub::MonitorEnterStub(LIR_Opr obj_reg, LIR_Opr lock_reg, CodeEmitInfo* info)

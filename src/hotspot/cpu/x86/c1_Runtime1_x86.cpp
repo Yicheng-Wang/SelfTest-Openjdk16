@@ -1131,6 +1131,7 @@ OopMapSet* Runtime1::generate_code_for(StubID id, StubAssembler* sasm) {
     case new_type_array_id:
     case new_type_keep_array_id:
     case new_object_array_id:
+    case new_keep_object_array_id:
       {
         Register length   = rbx; // Incoming
         Register klass    = rdx; // Incoming
@@ -1224,6 +1225,8 @@ OopMapSet* Runtime1::generate_code_for(StubID id, StubAssembler* sasm) {
             call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_type_array), klass, length);
         }else if(id == new_type_keep_array_id){
             call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_type_keep_array), klass, length);
+        }else if(id == new_keep_object_array_id){
+            call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_keep_object_array), klass, length);
         }else{
           call_offset = __ call_RT(obj, noreg, CAST_FROM_FN_PTR(address, new_object_array), klass, length);
         }

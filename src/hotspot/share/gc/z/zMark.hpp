@@ -112,7 +112,7 @@ public:
   void flush_and_free();
   bool flush_and_free(Thread* thread);
 
-    static void follow_object(oop obj, bool finalizable);
+  static void follow_object(oop obj, bool finalizable);
 };
 
 #endif // SHARE_GC_Z_ZMARK_HPP
