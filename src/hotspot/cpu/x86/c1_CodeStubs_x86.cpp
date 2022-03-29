@@ -263,6 +263,24 @@ NewObjectArrayStub::NewObjectArrayStub(LIR_Opr klass_reg, LIR_Opr length, LIR_Op
   _info = new CodeEmitInfo(info);
 }
 
+NewObjectKeepArrayStub::NewObjectKeepArrayStub(LIR_Opr klass_reg, LIR_Opr length, LIR_Opr result, CodeEmitInfo* info) {
+    _klass_reg = klass_reg;
+    _result = result;
+    _length = length;
+    _info = new CodeEmitInfo(info);
+}
+
+void NewObjectKeepArrayStub::emit_code(LIR_Assembler* ce) {
+    assert(__ rsp_offset() == 0, "frame size should be fixed");
+    __ bind(_entry);
+    assert(_length->as_register() == rbx, "length must in rbx,");
+    assert(_klass_reg->as_register() == rdx, "klass_reg must in rdx");
+    __ call(RuntimeAddress(Runtime1::entry_for(Runtime1::new_object_keep_array_id)));
+    ce->add_call_info_here(_info);
+    ce->verify_oop_map(_info);
+    assert(_result->as_register() == rax, "result must in rax,");
+    __ jmp(_continuation);
+}
 
 void NewObjectArrayStub::emit_code(LIR_Assembler* ce) {
   assert(__ rsp_offset() == 0, "frame size should be fixed");

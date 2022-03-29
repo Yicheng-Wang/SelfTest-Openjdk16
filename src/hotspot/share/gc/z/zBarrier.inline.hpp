@@ -296,8 +296,8 @@ inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o)
         log_info(gc, heap)("Not Jump Load: " SIZE_FORMAT, ZBarrier::non_skipbarrier);
     }*/
     if(ZAddress::is_keep(ZOop::to_address(o))){
-        if(ZDriver::KeepPermit && during_mark())
-            mark_barrier_on_oop_slow_path(ZOop::to_address(o));
+        if(ZDriver::KeepPermit && !during_relocate())
+            load_barrier_on_oop_slow_path(ZOop::to_address(o));
         return o;
     }
   return barrier<is_good_or_null_fast_path, load_barrier_on_oop_slow_path>(p, o);
@@ -344,11 +344,21 @@ inline oop ZBarrier::load_barrier_on_phantom_oop_field_preloaded(volatile oop* p
 
 inline void ZBarrier::load_barrier_on_root_oop_field(oop* p) {
   const oop o = *p;
+    if(ZAddress::is_keep(ZOop::to_address(o))){
+        if(ZDriver::KeepPermit && !during_relocate())
+            load_barrier_on_oop_slow_path(ZOop::to_address(o));
+        return;
+    }
   root_barrier<is_good_or_null_fast_path, load_barrier_on_oop_slow_path>(p, o);
 }
 
 inline void ZBarrier::load_barrier_on_invisible_root_oop_field(oop* p) {
   const oop o = *p;
+    if(ZAddress::is_keep(ZOop::to_address(o))){
+        if(ZDriver::KeepPermit && !during_relocate())
+            load_barrier_on_invisible_root_oop_slow_path(ZOop::to_address(o));
+        return;
+    }
   root_barrier<is_good_or_null_fast_path, load_barrier_on_invisible_root_oop_slow_path>(p, o);
 }
 
@@ -477,6 +487,11 @@ inline void ZBarrier::mark_barrier_on_oop_field(volatile oop* p, bool finalizabl
   const oop o = Atomic::load(p);
 
   if (finalizable) {
+      if(ZAddress::is_keep(ZOop::to_address(o))){
+          if(ZDriver::KeepPermit && during_mark())
+              mark_barrier_on_finalizable_oop_slow_path(ZOop::to_address(o));
+          return;
+      }
     barrier<is_marked_or_null_fast_path, mark_barrier_on_finalizable_oop_slow_path>(p, o);
   } else {
     const uintptr_t addr = ZOop::to_address(o);

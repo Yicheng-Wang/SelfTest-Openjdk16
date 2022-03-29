@@ -161,6 +161,19 @@ public class ArrayList<E> extends AbstractList<E>
                                                initialCapacity);
         }
     }
+	
+	/**
+     * Constructs an empty list with the specified initial capacity.
+     *
+	 * @param  keep  whether keep
+     * @throws IllegalArgumentException if the specified initial capacity
+     *         is negative
+     */
+    public ArrayList(Object[] keep) {
+		
+		this.elementData = keep;
+		
+    }
 
     /**
      * Constructs an empty list with an initial capacity of ten.

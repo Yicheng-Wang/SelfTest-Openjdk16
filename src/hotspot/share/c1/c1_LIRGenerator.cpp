@@ -676,7 +676,7 @@ void LIRGenerator::new_instance(LIR_Opr dst, ciInstanceKlass* klass, bool is_unr
 
     Runtime1::StubID stub_id = klass->is_initialized() ? Runtime1::fast_new_instance_id : Runtime1::fast_new_instance_init_check_id;
 
-    stub_id = alloc_gen>0?Runtime1::new_keep_instance_id:stub_id;
+    stub_id = alloc_gen==1?Runtime1::new_keep_instance_id:stub_id;
 
     CodeStub* slow_path = new NewInstanceStub(klass_reg, dst, klass, info, stub_id);
 
@@ -688,7 +688,7 @@ void LIRGenerator::new_instance(LIR_Opr dst, ciInstanceKlass* klass, bool is_unr
                        oopDesc::header_size(), instance_size, klass_reg, !klass->is_initialized(), slow_path, alloc_gen);
   } else {
       CodeStub* slow_path;
-      if(alloc_gen>0)
+      if(alloc_gen == 1)
           slow_path = new NewInstanceStub(klass_reg, dst, klass, info, Runtime1::new_keep_instance_id);
       else
           slow_path = new NewInstanceStub(klass_reg, dst, klass, info, Runtime1::new_instance_id);

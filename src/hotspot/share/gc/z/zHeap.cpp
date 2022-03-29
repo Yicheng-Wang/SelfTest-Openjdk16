@@ -364,9 +364,9 @@ void ZHeap::select_relocation_set() {
       }
       selector.register_live_page(page);
     } else {
-        /*if(page->is_keep()){
+        if(page->is_keep()){
             log_info(gc, heap)("Release Keep Page!!!");
-        }*/
+        }
       // Register empty page
       selector.register_empty_page(page);
 

@@ -85,7 +85,9 @@ uintptr_t ZBarrier::mark(uintptr_t addr) {
   } else if (ZAddress::is_remapped(addr)) {
     // Already remapped, but also needs to be marked
     good_addr = ZAddress::good(addr);
-  } else {
+  } else if(ZAddress::is_keep(addr)){
+      good_addr = addr;
+  } else{
     // Needs to be both remapped and marked
     good_addr = remap(addr);
   }

@@ -1321,7 +1321,7 @@ void LIRGenerator::do_NewTypeArray(NewTypeArray* x) {
   __ metadata2reg(ciTypeArrayKlass::make(elem_type)->constant_encoding(), klass_reg);
   CodeStub* slow_path;
 
-  if(alloc_gen>0){
+  if(alloc_gen == 1){
       slow_path = new NewTypeKeepArrayStub(klass_reg, len, reg, info, alloc_gen);
   }
   else{
@@ -1336,6 +1336,10 @@ void LIRGenerator::do_NewTypeArray(NewTypeArray* x) {
 
 
 void LIRGenerator::do_NewObjectArray(NewObjectArray* x) {
+    Method* compileMethod = this->compilation()->env()->task()->method();
+    int visiablebci = x->state()->bci();
+    //int bci = this->compilation()->current_instruction()->printable_bci();
+    int alloc_gen = get_alloc_gen_1(compileMethod->alloc_anno_cache(),visiablebci);
   LIRItem length(x->length(), this);
   // in case of patching (i.e., object class is not yet loaded), we need to reexecute the instruction
   // and therefore provide the state before the parameters have been consumed
@@ -1356,13 +1360,18 @@ void LIRGenerator::do_NewObjectArray(NewObjectArray* x) {
   length.load_item_force(FrameMap::rbx_opr);
   LIR_Opr len = length.result();
 
-  CodeStub* slow_path = new NewObjectArrayStub(klass_reg, len, reg, info);
+  CodeStub* slow_path;
+    if(alloc_gen == 1){
+        slow_path = new NewObjectKeepArrayStub(klass_reg, len, reg, info);
+    }else{
+        slow_path = new NewObjectArrayStub(klass_reg, len, reg, info);
+    }
   ciKlass* obj = (ciKlass*) ciObjArrayKlass::make(x->klass());
   if (obj == ciEnv::unloaded_ciobjarrayklass()) {
     BAILOUT("encountered unloaded_ciobjarrayklass due to out of memory error");
   }
   klass2reg_with_patching(klass_reg, obj, patching_info);
-  __ allocate_array(reg, len, tmp1, tmp2, tmp3, tmp4, T_OBJECT, klass_reg, slow_path, 0);
+  __ allocate_array(reg, len, tmp1, tmp2, tmp3, tmp4, T_OBJECT, klass_reg, slow_path, alloc_gen);
 
   LIR_Opr result = rlock_result(x);
   __ move(reg, result);

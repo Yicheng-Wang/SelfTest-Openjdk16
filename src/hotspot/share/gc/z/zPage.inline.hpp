@@ -197,7 +197,7 @@ inline bool ZPage::is_object_strongly_live(uintptr_t addr) const {
 }
 
 inline bool ZPage::mark_object(uintptr_t addr, bool finalizable, bool& inc_live) {
-  assert(ZAddress::is_marked(addr), "Invalid address");
+  assert(ZAddress::is_marked(addr) || ZAddress::is_keep(addr), "Invalid address");
   assert(is_relocatable(), "Invalid page state");
   assert(is_in(addr), "Invalid address");
 

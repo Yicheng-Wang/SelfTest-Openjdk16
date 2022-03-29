@@ -1164,7 +1164,7 @@ bool PhaseMacroExpand::eliminate_boxing_node(CallStaticJavaNode *boxing) {
 //---------------------------set_eden_pointers-------------------------
 void PhaseMacroExpand::set_eden_pointers(Node* &eden_top_adr, Node* &eden_end_adr, int alloc_gen) {
   if (UseTLAB) {                // Private allocation: load from TLS
-    if(alloc_gen>0){
+    if(alloc_gen == 1){
         //log_info(gc, heap)("C2 TKLAB Allocation!");
         Node* thread = transform_later(new ThreadLocalNode());
         int tklab_top_offset = in_bytes(JavaThread::tklab_top_offset());
@@ -1821,7 +1821,7 @@ Node* PhaseMacroExpand::prefetch_allocation(Node* i_o, Node*& needgc_false,
       Node *thread = new ThreadLocalNode();
       transform_later(thread);
       Node *eden_pf_adr;
-      if(alloc_gen>0){
+      if(alloc_gen == 1){
            eden_pf_adr = new AddPNode( top()/*not oop*/, thread,
                                        _igvn.MakeConX(in_bytes(JavaThread::tklab_pf_top_offset())) );
       }
