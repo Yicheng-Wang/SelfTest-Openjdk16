@@ -961,7 +961,7 @@ public:
   instanceHandle allocate_instance_handle(TRAPS);
 
   objArrayOop allocate_objArray(int n, int length, TRAPS);
-  objArrayOop allocate_objArray(int n, int length, int gen, TRAPS);
+  objArrayOop allocate_objArray(int n, int length, int alloc_gen, TRAPS);
   // Helper function
   static instanceOop register_finalizer(instanceOop i, TRAPS);
 

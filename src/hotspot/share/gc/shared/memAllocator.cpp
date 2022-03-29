@@ -271,7 +271,7 @@ HeapWord* MemAllocator::allocate_inside_tlab(Allocation& allocation, int alloc_g
 
   // Try allocating from an existing TLAB.
   HeapWord* mem;
-  if(alloc_gen){
+  if(alloc_gen == 1){
       mem = _thread->tklab().allocate(_word_size);
       if (mem != NULL) {
           return mem;

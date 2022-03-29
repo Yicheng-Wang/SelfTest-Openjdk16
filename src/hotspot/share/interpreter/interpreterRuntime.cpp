@@ -340,7 +340,11 @@ JRT_END
 
 JRT_ENTRY(void, InterpreterRuntime::anewarray(JavaThread* thread, ConstantPool* pool, int index, jint size))
   Klass*    klass = pool->klass_at(index, CHECK);
-  objArrayOop obj = oopFactory::new_objArray(klass, size, CHECK);
+  int alloc_gen = get_alloc_gen(thread, 1);
+  if(alloc_gen>0){
+      log_info(gc, heap)("One Keep Object Array");
+  }
+  objArrayOop obj = oopFactory::new_objArray(klass, size, alloc_gen, CHECK);
   thread->set_vm_result(obj);
 JRT_END
 

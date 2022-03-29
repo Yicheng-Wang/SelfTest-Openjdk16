@@ -195,6 +195,16 @@ public class ArrayDeque<E> extends AbstractCollection<E>
                        numElements + 1];
     }
 
+	/**
+     * Constructs an empty array deque with an initial capacity
+     * sufficient to hold the specified number of elements.
+     *
+	 * @param keep is for keep
+     */
+    public ArrayDeque(Object[] keep) {
+        elements = keep;
+    }
+	
     /**
      * Constructs a deque containing the elements of the specified
      * collection, in the order they are returned by the collection's

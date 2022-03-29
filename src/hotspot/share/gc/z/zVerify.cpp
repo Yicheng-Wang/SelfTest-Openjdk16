@@ -82,6 +82,7 @@ public:
       // Don't know the state of the oop.
       oop obj = *p;
       obj = NativeAccess<AS_NO_KEEPALIVE>::oop_load(&obj);
+      oop test = *p;
       z_verify_oop(&obj);
     }
   }
@@ -137,7 +138,7 @@ public:
   void do_oop(oop* p) {
     if (_verifying_bad_frames) {
       const oop obj = *p;
-      guarantee(!ZAddress::is_good(ZOop::to_address(obj)), BAD_OOP_ARG(obj, p));
+      guarantee(!ZAddress::is_pure_good(ZOop::to_address(obj)), BAD_OOP_ARG(obj, p));
     }
     _cl->do_oop(p);
   }

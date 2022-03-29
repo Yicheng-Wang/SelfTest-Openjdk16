@@ -41,6 +41,7 @@ public:
   static bool is_null(uintptr_t value);
   static bool is_bad(uintptr_t value);
   static bool is_good(uintptr_t value);
+  static bool is_pure_good(uintptr_t value);
   static bool is_keep(uintptr_t value);
   static bool is_good_or_null(uintptr_t value);
   static bool is_weak_bad(uintptr_t value);

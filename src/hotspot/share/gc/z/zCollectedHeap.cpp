@@ -163,15 +163,6 @@ oop ZCollectedHeap::array_allocate(Klass* klass, int alloc_gen, int size, int le
   }
 
   ZObjArrayAllocator allocator(klass, size, length, THREAD);
-  /*if(alloc_gen>0){
-      _KeepCount ++;
-      if(_KeepCount/(1024)!=(_KeepCount-1)/(1024)){
-          log_info(gc, heap)("Keep Alloc: " SIZE_FORMAT ,_KeepCount);
-      }
-      if(!klass->is_typeArray_klass()){
-          log_info(gc, heap)("Not right type: ");
-      }
-  }*/
   return allocator.allocate(alloc_gen);
 }
 

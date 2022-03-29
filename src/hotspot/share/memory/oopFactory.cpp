@@ -120,10 +120,18 @@ objArrayOop oopFactory::new_objArray(Klass* klass, int length, TRAPS) {
   if (klass->is_array_klass()) {
     return ArrayKlass::cast(klass)->allocate_arrayArray(1, length, THREAD);
   } else {
-    return InstanceKlass::cast(klass)->allocate_objArray(1, length, THREAD);
+    return InstanceKlass::cast(klass)->allocate_objArray(1, length,0, THREAD);
   }
 }
 
+objArrayOop oopFactory::new_objArray(Klass* klass, int length, int alloc_gen, TRAPS) {
+    assert(klass->is_klass(), "must be instance class");
+    if (klass->is_array_klass()) {
+        return ArrayKlass::cast(klass)->allocate_arrayArray(1, length, THREAD);
+    } else {
+        return InstanceKlass::cast(klass)->allocate_objArray(1, length, alloc_gen, THREAD);
+    }
+}
 objArrayHandle oopFactory::new_objArray_handle(Klass* klass, int length, TRAPS) {
   objArrayOop obj = new_objArray(klass, length, CHECK_(objArrayHandle()));
   return objArrayHandle(THREAD, obj);
