@@ -42,13 +42,13 @@ inline ReferenceDiscoverer* ZHeap::reference_discoverer() {
   return &_reference_processor;
 }
 
-/*inline bool ZHeap::is_object_in_keep(uintptr_t addr){
+inline bool ZHeap::is_object_in_keep(uintptr_t addr){
     ZPage* page = _page_table.get(addr);
     if(page->is_keep())
         return true;
     else
         return false;
-}*/
+}
 
 /*inline void ZHeap::setDirect(uintptr_t addr){
     ZPage* page = _page_table.get(addr);
@@ -91,7 +91,7 @@ inline void ZHeap::mark_object(uintptr_t addr) {
 
 inline uintptr_t ZHeap::alloc_tlab(size_t size) {
   guarantee(size <= max_tlab_size(), "TLAB too large");
-  return _object_allocator.alloc_object(size);
+  return _object_allocator.alloc_object(size,0);
 }
 
 inline uintptr_t ZHeap::alloc_tklab(size_t size) {
@@ -99,8 +99,8 @@ inline uintptr_t ZHeap::alloc_tklab(size_t size) {
     return _object_allocator.alloc_tklab(size);
 }
 
-inline uintptr_t ZHeap::alloc_object(size_t size) {
-  uintptr_t addr = _object_allocator.alloc_object(size);
+inline uintptr_t ZHeap::alloc_object(size_t size, int alloc_gen) {
+  uintptr_t addr = _object_allocator.alloc_object(size, alloc_gen);
   assert(ZAddress::is_good_or_null(addr), "Bad address");
 
   if (addr == 0) {

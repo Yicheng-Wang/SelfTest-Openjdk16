@@ -252,9 +252,9 @@ void MemAllocator::Allocation::notify_allocation() {
   notify_allocation_jvmti_sampler();
 }
 
-HeapWord* MemAllocator::allocate_outside_tlab(Allocation& allocation) const {
+HeapWord* MemAllocator::allocate_outside_tlab(Allocation& allocation, int alloc_gen) const {
   allocation._allocated_outside_tlab = true;
-  HeapWord* mem = Universe::heap()->mem_allocate(_word_size, &allocation._overhead_limit_exceeded);
+  HeapWord* mem = Universe::heap()->mem_allocate(_word_size, &allocation._overhead_limit_exceeded, alloc_gen);
   if (mem == NULL) {
     return mem;
   }
@@ -360,6 +360,9 @@ HeapWord* MemAllocator::allocate_inside_tlab_slow(Allocation& allocation) const 
 HeapWord* MemAllocator::allocate_inside_tklab_slow(Allocation& allocation) const{
     HeapWord* mem = NULL;
 
+    if(ZUtils::words_to_bytes(align_object_size(_word_size)) > ZPageSizeSmall)
+        return NULL;
+
     ThreadLocalAllocBuffer& tlab = _thread->tklab();
 
     // Retain tlab and allocate object in shared space if
@@ -417,7 +420,7 @@ HeapWord* MemAllocator::mem_allocate(Allocation& allocation,int alloc_gen) const
     }
   }
 
-  return allocate_outside_tlab(allocation);
+  return allocate_outside_tlab(allocation, alloc_gen);
 }
 
 oop MemAllocator::allocate(int alloc_gen) const {

@@ -46,7 +46,7 @@ private:
   HeapWord* allocate_inside_tlab(Allocation& allocation,int alloc_gen) const;
   HeapWord* allocate_inside_tlab_slow(Allocation& allocation) const;
   HeapWord* allocate_inside_tklab_slow(Allocation& allocation) const;
-  HeapWord* allocate_outside_tlab(Allocation& allocation) const;
+  HeapWord* allocate_outside_tlab(Allocation& allocation, int alloc_gen) const;
 
 protected:
   MemAllocator(Klass* klass, size_t word_size, Thread* thread)

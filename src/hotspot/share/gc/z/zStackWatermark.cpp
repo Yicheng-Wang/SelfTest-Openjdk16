@@ -80,7 +80,11 @@ void ZStackWatermark::start_processing_impl(void* context) {
   ZVerify::verify_thread_frames_bad(_jt);
 
   // Update thread local address bad mask
-  ZThreadLocalData::set_address_bad_mask(_jt, ZAddressBadMask);
+    if(ZDriver::KeepPermit){
+        ZThreadLocalData::set_address_bad_mask(_jt, ZAddressBadMask|ZAddressKeepMask);
+    }else{
+        ZThreadLocalData::set_address_bad_mask(_jt, ZAddressBadMask);
+    }
   ZThreadLocalData::set_address_keep_mask(_jt, ZAddressGoodMask);
 
   // Retire TLAB

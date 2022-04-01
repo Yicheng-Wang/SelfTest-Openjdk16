@@ -593,7 +593,7 @@ private:
 
 public:
   HeapWord* allocate_memory(ShenandoahAllocRequest& request);
-  HeapWord* mem_allocate(size_t size, bool* what);
+  HeapWord* mem_allocate(size_t size, bool* what, int alloc_gen);
   MetaWord* satisfy_failed_metadata_allocation(ClassLoaderData* loader_data,
                                                size_t size,
                                                Metaspace::MetadataType mdtype);
