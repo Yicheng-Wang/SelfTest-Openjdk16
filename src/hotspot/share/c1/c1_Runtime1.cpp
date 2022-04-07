@@ -376,7 +376,7 @@ JRT_ENTRY(void, Runtime1::new_keep_instance(JavaThread* thread, Klass* klass))
     assert(klass->is_klass(), "not a class");
     Handle holder(THREAD, klass->klass_holder()); // keep the klass alive
     InstanceKlass* h = InstanceKlass::cast(klass);
-    log_info(gc, heap)("From C1 Keep object");
+    // log_info(gc, heap)("From C1 Keep object");
     h->check_valid_for_instantiation(true, CHECK);
     // make sure klass is initialized
     h->initialize(CHECK);
@@ -427,6 +427,7 @@ JRT_ENTRY(void, Runtime1::new_type_keep_array(JavaThread* thread, Klass* klass, 
     //       anymore after new_typeArray() and no GC can happen before.
     //       (This may have to change if this code changes!)
     assert(klass->is_klass(), "not a class");
+    // log_info(gc, heap)("From C1 type Keep object");
     BasicType elt_type = TypeArrayKlass::cast(klass)->element_type();
     // log_info(gc, heap)("From C1 Keep array");
     oop obj = oopFactory::new_typeArray(1, elt_type, length, CHECK);
@@ -464,6 +465,7 @@ JRT_ENTRY(void, Runtime1::new_object_keep_array(JavaThread* thread, Klass* array
     //       anymore after new_objArray() and no GC can happen before.
     //       (This may have to change if this code changes!)
     assert(array_klass->is_klass(), "not a class");
+    // log_info(gc, heap)("From C1 object Keep object");
     Handle holder(THREAD, array_klass->klass_holder()); // keep the klass alive
     Klass* elem_klass = ObjArrayKlass::cast(array_klass)->element_klass();
     objArrayOop obj = oopFactory::new_objArray(elem_klass, length, 1, CHECK);

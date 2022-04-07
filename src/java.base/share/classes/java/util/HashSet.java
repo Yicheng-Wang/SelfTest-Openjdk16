@@ -220,6 +220,24 @@ public class HashSet<E>
     public boolean add(E e) {
         return map.put(e, PRESENT)==null;
     }
+	
+	/**
+     * Adds the specified element to this set if it is not already present.
+     * More formally, adds the specified element {@code e} to this set if
+     * this set contains no element {@code e2} such that
+     * {@code Objects.equals(e, e2)}.
+     * If this set already contains the element, the call leaves the set
+     * unchanged and returns {@code false}.
+     *
+     * @param keep is for keep
+	 * @param key is the key
+	 * @param hash is for hash
+     * @return {@code true} if this set did not already contain the specified
+     * element
+     */
+    public boolean add(HashNode<E, Object> keep, E key, int hash) {
+        return map.put(keep, key, hash)==null;
+    }
 
     /**
      * Removes the specified element from this set if it is present.

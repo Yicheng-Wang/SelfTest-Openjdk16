@@ -189,9 +189,9 @@ public class LinkedHashMap<K,V>
     /**
      * HashMap.Node subclass for normal LinkedHashMap entries.
      */
-    static class Entry<K,V> extends HashMap.Node<K,V> {
+    static class Entry<K,V> extends HashNode<K,V> {
         Entry<K,V> before, after;
-        Entry(int hash, K key, V value, Node<K,V> next) {
+        Entry(int hash, K key, V value, HashNode<K,V> next) {
             super(hash, key, value, next);
         }
     }
@@ -253,14 +253,14 @@ public class LinkedHashMap<K,V>
         head = tail = null;
     }
 
-    Node<K,V> newNode(int hash, K key, V value, Node<K,V> e) {
+    HashNode<K,V> newNode(int hash, K key, V value, HashNode<K,V> e) {
         LinkedHashMap.Entry<K,V> p =
             new LinkedHashMap.Entry<>(hash, key, value, e);
         linkNodeLast(p);
         return p;
     }
 
-    Node<K,V> replacementNode(Node<K,V> p, Node<K,V> next) {
+    HashNode<K,V> replacementNode(HashNode<K,V> p, HashNode<K,V> next) {
         LinkedHashMap.Entry<K,V> q = (LinkedHashMap.Entry<K,V>)p;
         LinkedHashMap.Entry<K,V> t =
             new LinkedHashMap.Entry<>(q.hash, q.key, q.value, next);
@@ -268,20 +268,20 @@ public class LinkedHashMap<K,V>
         return t;
     }
 
-    TreeNode<K,V> newTreeNode(int hash, K key, V value, Node<K,V> next) {
+    TreeNode<K,V> newTreeNode(int hash, K key, V value, HashNode<K,V> next) {
         TreeNode<K,V> p = new TreeNode<>(hash, key, value, next);
         linkNodeLast(p);
         return p;
     }
 
-    TreeNode<K,V> replacementTreeNode(Node<K,V> p, Node<K,V> next) {
+    TreeNode<K,V> replacementTreeNode(HashNode<K,V> p, HashNode<K,V> next) {
         LinkedHashMap.Entry<K,V> q = (LinkedHashMap.Entry<K,V>)p;
         TreeNode<K,V> t = new TreeNode<>(q.hash, q.key, q.value, next);
         transferLinks(q, t);
         return t;
     }
 
-    void afterNodeRemoval(Node<K,V> e) { // unlink
+    void afterNodeRemoval(HashNode<K,V> e) { // unlink
         LinkedHashMap.Entry<K,V> p =
             (LinkedHashMap.Entry<K,V>)e, b = p.before, a = p.after;
         p.before = p.after = null;
@@ -303,7 +303,7 @@ public class LinkedHashMap<K,V>
         }
     }
 
-    void afterNodeAccess(Node<K,V> e) { // move node to last
+    void afterNodeAccess(HashNode<K,V> e) { // move node to last
         LinkedHashMap.Entry<K,V> last;
         if (accessOrder && (last = tail) != e) {
             LinkedHashMap.Entry<K,V> p =
@@ -437,7 +437,7 @@ public class LinkedHashMap<K,V>
      * distinguish these two cases.
      */
     public V get(Object key) {
-        Node<K,V> e;
+        HashNode<K,V> e;
         if ((e = getNode(key)) == null)
             return null;
         if (accessOrder)
@@ -449,7 +449,7 @@ public class LinkedHashMap<K,V>
      * {@inheritDoc}
      */
     public V getOrDefault(Object key, V defaultValue) {
-       Node<K,V> e;
+       HashNode<K,V> e;
        if ((e = getNode(key)) == null)
            return defaultValue;
        if (accessOrder)
@@ -685,7 +685,7 @@ public class LinkedHashMap<K,V>
                 return false;
             Map.Entry<?,?> e = (Map.Entry<?,?>) o;
             Object key = e.getKey();
-            Node<K,V> candidate = getNode(key);
+            HashNode<K,V> candidate = getNode(key);
             return candidate != null && candidate.equals(e);
         }
         public final boolean remove(Object o) {
@@ -764,7 +764,7 @@ public class LinkedHashMap<K,V>
         }
 
         public final void remove() {
-            Node<K,V> p = current;
+            HashNode<K,V> p = current;
             if (p == null)
                 throw new IllegalStateException();
             if (modCount != expectedModCount)

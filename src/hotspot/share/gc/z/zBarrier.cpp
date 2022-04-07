@@ -81,12 +81,10 @@ uintptr_t ZBarrier::mark(uintptr_t addr) {
   //assert(!ZAddress::is_keep(addr),"Not mark Keep");
   if (ZAddress::is_marked(addr)) {
     // Already marked, but try to mark though anyway
-    good_addr = ZAddress::good(addr);
+    good_addr = addr;
   } else if (ZAddress::is_remapped(addr)) {
     // Already remapped, but also needs to be marked
     good_addr = ZAddress::good(addr);
-  } else if(ZAddress::is_keep(addr)){
-      good_addr = addr;
   } else{
     // Needs to be both remapped and marked
     good_addr = remap(addr);
