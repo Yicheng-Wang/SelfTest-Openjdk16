@@ -1259,21 +1259,72 @@ Node* PhaseMacroExpand::make_store(Node* ctl, Node* mem, Node* base, int offset,
 // slow-path call.
 //
 
-int PhaseMacroExpand::get_alloc_gen_2(Array<u2>* aac, int bci) {
+int PhaseMacroExpand::get_alloc_gen_2(Method* method, int bci, int n_dims) {
+    int alloc_gen = 0;
+    int next_centry = 0;
+    Array<u2>* aac = method->alloc_anno_cache();
+
     // First, look into cache.
     if (aac != NULL) {
-        for (int i = 0; i < aac->length(); i++) {
-            if (bci == aac->at(i)) {
+        for (; next_centry < aac->length(); next_centry++) {
+
+            if (bci == aac->at(next_centry)) {
+                // assert(thread != Thread::current(), "sanity");
                 return 1;
             }
             // Note: I prefill the array with max_jushort.
-            if (aac->at(i) == max_jushort) {
-                // No cache entry at 'i'
-                return 0;
+            if (aac->at(next_centry) == max_jushort) {
+                // No cache entry at 'next_centry'
+                break;
             }
         }
     }
-    return 0;
+
+    if(aac != NULL) {
+
+        AnnotationArray* aa = method->type_annotations();
+        // ConstantPool* pool = method->constants();
+
+        u1* data = aa->data();
+
+        // Get short (# of annotations)
+        u2 n_anno =Bytes::get_Java_u2(data);
+
+        data += 2;
+        for (u2 i = 0; i < n_anno; i++) {
+//            // byte target type (should be 68 == 0x44 == NEW)
+            // u1 anno_target = *data;
+//            // Get short (location, should be bci)
+            u2 anno_bci = Bytes::get_Java_u2(data + 1);
+            // byte loc data size (should be zero)
+            u1 dsize = *(data + 3);
+            // Note: after the previous byte comes 'dsize'*2 bytes of location data.
+            // Get short (type index in constant pool, should be Old)
+            //u2 anno_type_index = Bytes::get_Java_u2(data + 4 + dsize*2);
+            // Get char* (type name, should be Ljava/lang/Gen;)
+            //Symbol* type_name = pool->symbol_at(anno_type_index);
+
+            // Note: If anno_bco == bci, then they both point to the same bc. In this
+            // situation there is no need to fix the bci. Only if they differ, we
+            // should look into the size of make sure that both bcis are a match.
+            int anno_bc_len = 0;
+
+            for (int i = 0; i < n_dims; i++) {
+                anno_bc_len += Bytecodes::length_for(Bytecodes::code_at(method, anno_bci + anno_bc_len));
+            }
+
+
+            if ((anno_bci+anno_bc_len) == bci) {
+                aac->at_put(next_centry, bci); // Storing in cache.
+                return 1;
+            }
+            // <underscore> 8 is the number of bytes used a alloc annotation.
+            // <underscore> Note: I'm assuming the annotation has no elements!
+            data += 8 + dsize*2;
+        }
+    }
+
+    return alloc_gen;
 }
 
 void PhaseMacroExpand::expand_allocate_common(
@@ -1285,8 +1336,11 @@ void PhaseMacroExpand::expand_allocate_common(
 {
     int bci = alloc->jvms()->bci();
     Method* m = alloc->jvms()->method()->get_Method();
-    int alloc_gen = get_alloc_gen_2(m->alloc_anno_cache(), bci);
-
+    int alloc_gen = 0;
+    if(length == NULL)
+        alloc_gen = get_alloc_gen_2(m, bci, 0);
+    else
+        alloc_gen = get_alloc_gen_2(m, bci, 1);
 
   Node* ctrl = alloc->in(TypeFunc::Control);
   Node* mem  = alloc->in(TypeFunc::Memory);

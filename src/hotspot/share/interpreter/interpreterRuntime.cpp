@@ -242,10 +242,10 @@ int InterpreterRuntime::get_alloc_gen(JavaThread* thread, int n_dims = 0) {
         }
     }
 
-    AnnotationArray* aa = method->type_annotations();
-    ConstantPool* pool = method->constants();
+    if(aac != NULL) {
 
-    if(aa != NULL && method->alloc_anno() != NULL) {
+        AnnotationArray* aa = method->type_annotations();
+        // ConstantPool* pool = method->constants();
 
         u1* data = aa->data();
 
@@ -255,16 +255,16 @@ int InterpreterRuntime::get_alloc_gen(JavaThread* thread, int n_dims = 0) {
         data += 2;
         for (u2 i = 0; i < n_anno; i++) {
 //            // byte target type (should be 68 == 0x44 == NEW)
-            u1 anno_target = *data;
+            // u1 anno_target = *data;
 //            // Get short (location, should be bci)
             u2 anno_bci = Bytes::get_Java_u2(data + 1);
             // byte loc data size (should be zero)
             u1 dsize = *(data + 3);
             // Note: after the previous byte comes 'dsize'*2 bytes of location data.
             // Get short (type index in constant pool, should be Old)
-            u2 anno_type_index = Bytes::get_Java_u2(data + 4 + dsize*2);
+            //u2 anno_type_index = Bytes::get_Java_u2(data + 4 + dsize*2);
             // Get char* (type name, should be Ljava/lang/Gen;)
-            Symbol* type_name = pool->symbol_at(anno_type_index);
+            //Symbol* type_name = pool->symbol_at(anno_type_index);
 
             // Note: If anno_bco == bci, then they both point to the same bc. In this
             // situation there is no need to fix the bci. Only if they differ, we
@@ -276,7 +276,7 @@ int InterpreterRuntime::get_alloc_gen(JavaThread* thread, int n_dims = 0) {
             }
 
 
-            if (anno_target == 68 && (anno_bci+anno_bc_len) == bci && type_name->equals("Ljava/lang/Keep;", 16)) {
+            if ((anno_bci+anno_bc_len) == bci) {
                 aac->at_put(next_centry, bci); // Storing in cache.
                 return 1;
             }
@@ -341,9 +341,9 @@ JRT_END
 JRT_ENTRY(void, InterpreterRuntime::anewarray(JavaThread* thread, ConstantPool* pool, int index, jint size))
   Klass*    klass = pool->klass_at(index, CHECK);
   int alloc_gen = get_alloc_gen(thread, 1);
-  if(alloc_gen>0){
+  /*if(alloc_gen>0){
       log_info(gc, heap)("One Keep Object Array");
-  }
+  }*/
   objArrayOop obj = oopFactory::new_objArray(klass, size, alloc_gen, CHECK);
   thread->set_vm_result(obj);
 JRT_END
