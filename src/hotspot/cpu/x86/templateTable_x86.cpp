@@ -3996,11 +3996,14 @@ void TemplateTable::_new() {
   Label done;
   Label initialize_header;
   Label initialize_object;  // including clearing the fields
-  Label swith_TLAB;
-  Label end_TLAB;
+  // Label swith_TLAB;
+  // Label end_TLAB;
+
+  __ get_method(rbx);
+  __ cmpptr(Address(rbx, in_bytes(Method::alloc_anno_offset())), (int32_t)NULL_WORD);
+  __ jcc(Assembler::notEqual, slow_case_no_pop);
 
   __ get_cpool_and_tags(rcx, rax);
-
   // Make sure the class we're about to instantiate has been resolved.
   // This is done before loading InstanceKlass to be consistent with the order
   // how Constant Pool is updated (see ConstantPool::klass_at_put)
@@ -4023,6 +4026,7 @@ void TemplateTable::_new() {
   __ testl(rdx, Klass::_lh_instance_slow_path_bit);
   __ jcc(Assembler::notZero, slow_case);
 
+  // __ jmp(slow_case);
   // Allocate the instance:
   //  If TLAB is enabled:
   //    Try to allocate in the TLAB.
@@ -4048,14 +4052,11 @@ void TemplateTable::_new() {
 #endif // _LP64
 
   if (UseTLAB) {
-    __ get_method(rbx);
-    __ cmpptr(Address(rbx, in_bytes(Method::alloc_anno_offset())), (int32_t)NULL_WORD);
-    __ jcc(Assembler::equal, swith_TLAB);
-    __ tklab_allocate(thread, rax, rdx, 0, rcx, rbx, slow_case);
-    __ jmp(end_TLAB);
-    __ bind(swith_TLAB);
+    //__ tklab_allocate(thread, rax, rdx, 0, rcx, rbx, slow_case);
+    //__ jmp(end_TLAB);
+    //__ bind(swith_TLAB);
     __ tlab_allocate(thread, rax, rdx, 0, rcx, rbx, slow_case);
-    __ bind(end_TLAB);
+    //__ bind(end_TLAB);
     if (ZeroTLAB) {
       // the fields have been already cleared
       __ jmp(initialize_header);

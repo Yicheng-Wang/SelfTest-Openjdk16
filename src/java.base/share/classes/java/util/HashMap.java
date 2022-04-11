@@ -464,6 +464,25 @@ public class HashMap<K,V> extends AbstractMap<K,V>
         this(initialCapacity, DEFAULT_LOAD_FACTOR);
     }
 
+	/**
+     * Constructs an empty {@code HashMap} with the specified initial
+     * capacity and the default load factor (0.75).
+     *
+     * @param  initialCapacity the initial capacity.
+	 * @param  testarray the for array test.
+     * @throws IllegalArgumentException if the initial capacity is negative.
+     */
+    public HashMap(int initialCapacity, HashNode<K,V>[] testarray) {
+		if (initialCapacity < 0)
+            throw new IllegalArgumentException("Illegal initial capacity: " +
+                                               initialCapacity);
+        if (initialCapacity > MAXIMUM_CAPACITY)
+            initialCapacity = MAXIMUM_CAPACITY;
+        this.loadFactor = DEFAULT_LOAD_FACTOR;
+        this.threshold = tableSizeFor(initialCapacity);
+        this.table = testarray;
+    }
+
     /**
      * Constructs an empty {@code HashMap} with the default initial capacity
      * (16) and the default load factor (0.75).
@@ -618,16 +637,28 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * value is replaced.
      *
      * @param keep is for keep
-	 * @param key is the key
      * @param hash is for hash
+     */
+	public void putkeep(HashNode<K,V> keep, int hash) {
+        putkeepVal(keep, hash, false, true);
+    }
+	
+	/**
+     * Associates the specified value with the specified key in this map.
+     * If the map previously contained a mapping for the key, the old
+     * value is replaced.
+     *
+     * @param key key with which the specified value is to be associated
+     * @param value value to be associated with the specified key
      * @return the previous value associated with {@code key}, or
      *         {@code null} if there was no mapping for {@code key}.
      *         (A {@code null} return can also indicate that the map
      *         previously associated {@code null} with {@code key}.)
      */
-	public V put(HashNode<K,V> keep, K key, int hash) {
-        return putVal(keep, key, hash, false, true);
+    public V puttest(K key, V value) {
+        return puttestVal(hash(key), key, value, false, true);
     }
+	
 	
     /**
      * Implements Map.put and related methods.
@@ -680,36 +711,45 @@ public class HashMap<K,V> extends AbstractMap<K,V>
             resize();
         afterNodeInsertion(evict);
         return null;
-		
     }
 	
 	/**
      * Implements Map.put and related methods.
      *
-	 * @param keep is for keep.
-	 * @param key is the key.
      * @param hash hash for key
+     * @param key the key
+     * @param value the value to put
      * @param onlyIfAbsent if true, don't change existing value
      * @param evict if false, the table is in creation mode.
-
      * @return previous value, or null if none
      */
-	final V putVal(HashNode<K,V> keep, K key, int hash, boolean onlyIfAbsent,
+	final V puttestVal(int hash, K key, V value, boolean onlyIfAbsent,
                    boolean evict) {
         HashNode<K,V>[] tab; HashNode<K,V> p; int n, i;
-        if ((tab = table) == null || (n = tab.length) == 0)
-            n = (tab = resize()).length;
+        if ((tab = table) == null || (n = tab.length) == 0){
+			int cap = threshold;
+			@SuppressWarnings({"rawtypes","unchecked"})
+			HashNode[] tabtest = new @Keep HashNode[cap];
+			@SuppressWarnings({"rawtypes","unchecked"})
+			HashNode<K,V>[] trans = (HashNode<K,V>[]) tabtest;
+			table = trans;
+			n = (tab = table).length;
+		}
         if ((p = tab[i = (n - 1) & hash]) == null)
-            tab[i] = keep;
+            tab[i] = newKeepNode(hash, key, value, null, true);
         else {
             HashNode<K,V> e; K k;
             if (p.hash == hash &&
                 ((k = p.key) == key || (key != null && key.equals(k))))
                 e = p;
+            else if (p instanceof TreeNode)
+                e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
             else {
                 for (int binCount = 0; ; ++binCount) {
                     if ((e = p.next) == null) {
-                        p.next = keep;
+                        p.next = newKeepNode(hash, key, value, null, true);
+                        if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
+                            treeifyBin(tab, hash);
                         break;
                     }
                     if (e.hash == hash &&
@@ -718,12 +758,71 @@ public class HashMap<K,V> extends AbstractMap<K,V>
                     p = e;
                 }
             }
+            if (e != null) { // existing mapping for key
+                V oldValue = e.value;
+                if (!onlyIfAbsent || oldValue == null)
+                    e.value = value;
+                afterNodeAccess(e);
+                return oldValue;
+            }
         }
         ++modCount;
         if (++size > threshold)
-            resize();
+		{
+			System.out.println("Should not resize");
+			resize();
+		}
+            
         afterNodeInsertion(evict);
         return null;
+    }
+	
+	/**
+     * Implements Map.put and related methods.
+     *
+	 * @param keep is for keep.
+     * @param hash hash for key
+     * @param onlyIfAbsent if true, don't change existing value
+     * @param evict if false, the table is in creation mode.
+     */
+	final void putkeepVal(HashNode<K,V> keep, int hash, boolean onlyIfAbsent,
+                   boolean evict) {
+        HashNode<K,V>[] tab; HashNode<K,V> p; int n, i;
+		tab = table;
+		n = tab.length;
+        if ((p = tab[i = (n - 1) & hash]) == null)
+            tab[i] = keep;
+        else {
+            HashNode<K,V> e; K k;
+            /*if (p.hash == hash &&
+                ((k = p.key) == key || (key != null && key.equals(k)))){
+					e = p;
+					System.out.println("What the hell");
+				}*/
+
+                for (int binCount = 0; ; ++binCount) {
+                    if ((e = p.next) == null) {
+                        p.next = keep;
+                        break;
+                    }
+                    /*if (e.hash == hash &&
+                        ((k = e.key) == key || (key != null && key.equals(k)))){
+							System.out.println("Need this?");
+							break;
+						}*/
+                    p = e;
+                }
+            
+        }
+        ++modCount;
+		++size;
+        /*if (++size > threshold){
+			System.out.println("Resize now");
+			resize();
+		}
+            
+        afterNodeInsertion(evict);
+        return null;*/
     }
 	
     /**
@@ -861,6 +960,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
             null : e.value;
     }
 
+	
     /**
      * Implements Map.remove and related methods.
      *
@@ -912,6 +1012,50 @@ public class HashMap<K,V> extends AbstractMap<K,V>
         return null;
     }
 
+	/**
+     * Implements Map.remove and related methods.
+     *
+     * @param key the key
+     */
+    final void removekeepnode(Object key) {
+		boolean matchValue = false;
+		Object value = null;
+		int hash = hash(key);
+        HashNode<K,V>[] tab; HashNode<K,V> p; int n, index;
+        if ((tab = table) != null && (n = tab.length) > 0 &&
+            (p = tab[index = (n - 1) & hash]) != null) {
+            HashNode<K,V> node = null, e; K k; V v;
+            if (p.hash == hash &&
+                ((k = p.key) == key || (key != null && key.equals(k))))
+                node = p;
+            else if ((e = p.next) != null) {
+                
+                    do {
+                        if (e.hash == hash &&
+                            ((k = e.key) == key ||
+                             (key != null && key.equals(k)))) {
+                            node = e;
+                            break;
+                        }
+                        p = e;
+                    } while ((e = e.next) != null);
+                
+            }
+            if (node != null && (!matchValue || (v = node.value) == value ||
+                                 (value != null && value.equals(v)))) {
+                if (node == p)
+                    tab[index] = node.next;
+                else
+                    p.next = node.next;
+                ++modCount;
+                --size;
+                /*afterNodeRemoval(node);
+                return node;*/
+            }
+        }
+        // return null;
+    }
+	
     /**
      * Removes all of the mappings from this map.
      * The map will be empty after this call returns.
@@ -1949,7 +2093,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
         return new HashNode<>(hash, key, value, next);
     }
 	
-	HashNode<K,V> newNode(int hash, K key, V value, HashNode<K,V> next, boolean keep) {
+	HashNode<K,V> newKeepNode(int hash, K key, V value, HashNode<K,V> next, boolean keep) {
         return new @Keep HashNode<>(hash, key, value, next);
     }
 

@@ -134,6 +134,21 @@ public class HashSet<E>
         map = new HashMap<>(initialCapacity, loadFactor);
     }
 
+
+	/**
+     * Constructs a new, empty set; the backing {@code HashMap} instance has
+     * the specified initial capacity and the specified load factor.
+     *
+     * @param      initialCapacity   the initial capacity of the hash map
+     * @param      testarray        new teste array
+     * @throws     IllegalArgumentException if the initial capacity is less
+     *             than zero, or if the load factor is nonpositive
+     */
+    public HashSet(int initialCapacity, HashNode<E,Object>[] testarray) {
+        map = new HashMap<>(initialCapacity, testarray);
+    }
+
+
     /**
      * Constructs a new, empty set; the backing {@code HashMap} instance has
      * the specified initial capacity and default load factor (0.75).
@@ -229,14 +244,27 @@ public class HashSet<E>
      * If this set already contains the element, the call leaves the set
      * unchanged and returns {@code false}.
      *
-     * @param keep is for keep
-	 * @param key is the key
-	 * @param hash is for hash
+     * @param e element to be added to this set
      * @return {@code true} if this set did not already contain the specified
      * element
      */
-    public boolean add(HashNode<E, Object> keep, E key, int hash) {
-        return map.put(keep, key, hash)==null;
+    public boolean addtest(E e) {
+        return map.puttest(e, PRESENT)==null;
+    }
+	
+	/**
+     * Adds the specified element to this set if it is not already present.
+     * More formally, adds the specified element {@code e} to this set if
+     * this set contains no element {@code e2} such that
+     * {@code Objects.equals(e, e2)}.
+     * If this set already contains the element, the call leaves the set
+     * unchanged and returns {@code false}.
+     *
+     * @param keep is for keep
+	 * @param hash is for hash
+     */
+    public void addkeep(HashNode<E, Object> keep, int hash) {
+        map.putkeep(keep, hash);
     }
 
     /**
@@ -255,6 +283,20 @@ public class HashSet<E>
         return map.remove(o)==PRESENT;
     }
 
+/**
+     * Removes the specified element from this set if it is present.
+     * More formally, removes an element {@code e} such that
+     * {@code Objects.equals(o, e)},
+     * if this set contains such an element.  Returns {@code true} if
+     * this set contained the element (or equivalently, if this set
+     * changed as a result of the call).  (This set will not contain the
+     * element once the call returns.)
+     *
+     * @param o object to be removed from this set, if present
+     */
+    public void removekeep(Object o) {
+        map.removekeepnode(o);
+    }
     /**
      * Removes all of the elements from this set.
      * The set will be empty after this call returns.
