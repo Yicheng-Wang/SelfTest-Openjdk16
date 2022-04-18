@@ -3999,9 +3999,9 @@ void TemplateTable::_new() {
   Label swith_TLAB;
   Label end_TLAB;
 
-  /*__ get_method(rbx);
+  __ get_method(rbx);
   __ cmpptr(Address(rbx, in_bytes(Method::alloc_anno_offset())), (int32_t)NULL_WORD);
-  __ jcc(Assembler::notEqual, slow_case_no_pop);*/
+  __ jcc(Assembler::notEqual, slow_case_no_pop);
 
   __ get_cpool_and_tags(rcx, rax);
   // Make sure the class we're about to instantiate has been resolved.
@@ -4052,14 +4052,14 @@ void TemplateTable::_new() {
 #endif // _LP64
 
   if (UseTLAB) {
-    __ get_method(rbx);
+    /*__ get_method(rbx);
     __ cmpptr(Address(rbx, in_bytes(Method::alloc_anno_offset())), (int32_t) NULL_WORD);
     __ jcc(Assembler::equal, swith_TLAB);
     __ tklab_allocate(thread, rax, rdx, 0, rcx, rbx, slow_case);
     __ jmp(end_TLAB);
-    __ bind(swith_TLAB);
+    __ bind(swith_TLAB);*/
     __ tlab_allocate(thread, rax, rdx, 0, rcx, rbx, slow_case);
-    __ bind(end_TLAB);
+    //__ bind(end_TLAB);
     if (ZeroTLAB) {
       // the fields have been already cleared
       __ jmp(initialize_header);

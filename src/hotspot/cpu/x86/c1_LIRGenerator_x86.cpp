@@ -1264,10 +1264,10 @@ void LIRGenerator::do_Convert(Convert* x) {
 
 void LIRGenerator::do_NewInstance(NewInstance* x) {
   print_if_not_loaded(x);
-  Method* compileMethod = this->compilation()->env()->task()->method();
+  /*Method* compileMethod = this->compilation()->env()->task()->method();
   int visiablebci = x->state()->bci();
-    //int bci = this->compilation()->current_instruction()->printable_bci();
-    int alloc_gen = get_alloc_gen_1(compileMethod,visiablebci,0);
+  int bci = this->compilation()->current_instruction()->printable_bci();*/
+    int alloc_gen = get_alloc_gen_1(this->compilation()->env()->task()->method()->alloc_anno_cache(),x->state()->bci());
   CodeEmitInfo* info = state_for(x, x->state());
   LIR_Opr reg = result_register_for(x->type());
   new_instance(reg, x->klass(), x->is_unresolved(),
@@ -1280,28 +1280,25 @@ void LIRGenerator::do_NewInstance(NewInstance* x) {
   __ move(reg, result);
 }
 
-int LIRGenerator::get_alloc_gen_1(Method* method, int bci, int n_dims) {
-    int alloc_gen = 0;
-    int next_centry = 0;
-    Array<u2>* aac = method->alloc_anno_cache();
-
+int LIRGenerator::get_alloc_gen_1(Array<u2>* aac, int bci) {
     // First, look into cache.
     if (aac != NULL) {
-        for (; next_centry < aac->length(); next_centry++) {
+        for (int i = 0; i < aac->length(); i++) {
 
-            if (bci == aac->at(next_centry)) {
+            if (bci == aac->at(i)) {
                 // assert(thread != Thread::current(), "sanity");
                 return 1;
             }
             // Note: I prefill the array with max_jushort.
-            if (aac->at(next_centry) == max_jushort) {
+            if (aac->at(i) == max_jushort) {
                 // No cache entry at 'next_centry'
-                break;
+                return 0;
+                //break;
             }
         }
     }
-
-    if(aac != NULL) {
+    return 0;
+    /*if(aac != NULL) {
 
         AnnotationArray* aa = method->type_annotations();
         // ConstantPool* pool = method->constants();
@@ -1345,15 +1342,15 @@ int LIRGenerator::get_alloc_gen_1(Method* method, int bci, int n_dims) {
         }
     }
 
-    return alloc_gen;
+    return alloc_gen;*/
 }
 
 void LIRGenerator::do_NewTypeArray(NewTypeArray* x) {
   CodeEmitInfo* info = state_for(x, x->state());
-  Method* compileMethod = this->compilation()->env()->task()->method();
-  int visiablebci = x->state()->bci();
+  /*Method* compileMethod = this->compilation()->env()->task()->method();
+  int visiablebci = x->state()->bci();*/
   //int bci = this->compilation()->current_instruction()->printable_bci();
-  int alloc_gen = get_alloc_gen_1(compileMethod,visiablebci,1);
+  int alloc_gen = get_alloc_gen_1(this->compilation()->env()->task()->method()->alloc_anno_cache(),x->state()->bci());
   /*if(alloc_gen>0){
       int i = 0;
   }*/
@@ -1387,10 +1384,10 @@ void LIRGenerator::do_NewTypeArray(NewTypeArray* x) {
 
 
 void LIRGenerator::do_NewObjectArray(NewObjectArray* x) {
-    Method* compileMethod = this->compilation()->env()->task()->method();
-    int visiablebci = x->state()->bci();
+    /*Method* compileMethod = this->compilation()->env()->task()->method();
+    int visiablebci = x->state()->bci();*/
     //int bci = this->compilation()->current_instruction()->printable_bci();
-    int alloc_gen = get_alloc_gen_1(compileMethod,visiablebci,1);
+    int alloc_gen = get_alloc_gen_1(this->compilation()->env()->task()->method()->alloc_anno_cache(),x->state()->bci());
   LIRItem length(x->length(), this);
   // in case of patching (i.e., object class is not yet loaded), we need to reexecute the instruction
   // and therefore provide the state before the parameters have been consumed

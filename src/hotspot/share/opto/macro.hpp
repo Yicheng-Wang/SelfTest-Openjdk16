@@ -215,7 +215,7 @@ public:
   void eliminate_macro_nodes();
   bool expand_macro_nodes();
 
-  static int get_alloc_gen_2(Method* method, int bci, int n_dims);
+  static int get_alloc_gen_2(Array<u2>* aac, int bci);
 
   PhaseIterGVN &igvn() const { return _igvn; }
 

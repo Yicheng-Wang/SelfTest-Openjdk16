@@ -1259,28 +1259,24 @@ Node* PhaseMacroExpand::make_store(Node* ctl, Node* mem, Node* base, int offset,
 // slow-path call.
 //
 
-int PhaseMacroExpand::get_alloc_gen_2(Method* method, int bci, int n_dims) {
-    int alloc_gen = 0;
-    int next_centry = 0;
-    Array<u2>* aac = method->alloc_anno_cache();
-
-    // First, look into cache.
+int PhaseMacroExpand::get_alloc_gen_2(Array<u2>* aac, int bci) {
     if (aac != NULL) {
-        for (; next_centry < aac->length(); next_centry++) {
+        for (int i = 0; i < aac->length(); i++) {
 
-            if (bci == aac->at(next_centry)) {
+            if (bci == aac->at(i)) {
                 // assert(thread != Thread::current(), "sanity");
                 return 1;
             }
             // Note: I prefill the array with max_jushort.
-            if (aac->at(next_centry) == max_jushort) {
+            if (aac->at(i) == max_jushort) {
                 // No cache entry at 'next_centry'
-                break;
+                return 0;
+                //break;
             }
         }
     }
-
-    if(aac != NULL) {
+    return 0;
+    /*if(aac != NULL) {
 
         AnnotationArray* aa = method->type_annotations();
         // ConstantPool* pool = method->constants();
@@ -1324,7 +1320,7 @@ int PhaseMacroExpand::get_alloc_gen_2(Method* method, int bci, int n_dims) {
         }
     }
 
-    return alloc_gen;
+    return alloc_gen;*/
 }
 
 void PhaseMacroExpand::expand_allocate_common(
@@ -1334,13 +1330,13 @@ void PhaseMacroExpand::expand_allocate_common(
             address slow_call_address  // Address of slow call
     )
 {
-    int bci = alloc->jvms()->bci();
-    Method* m = alloc->jvms()->method()->get_Method();
-    int alloc_gen = 0;
-    if(length == NULL)
+    /*int bci = alloc->jvms()->bci();
+    Method* m = alloc->jvms()->method()->get_Method();*/
+    int alloc_gen = get_alloc_gen_2(alloc->jvms()->method()->get_Method()->alloc_anno_cache(), alloc->jvms()->bci());
+    /*if(length == NULL)
         alloc_gen = get_alloc_gen_2(m, bci, 0);
     else
-        alloc_gen = get_alloc_gen_2(m, bci, 1);
+        alloc_gen = get_alloc_gen_2(m, bci, 1);*/
 
   Node* ctrl = alloc->in(TypeFunc::Control);
   Node* mem  = alloc->in(TypeFunc::Memory);
