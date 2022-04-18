@@ -194,6 +194,18 @@ public class ArrayDeque<E> extends AbstractCollection<E>
                        (numElements == Integer.MAX_VALUE) ? Integer.MAX_VALUE :
                        numElements + 1];
     }
+	
+	/**
+     * Constructs an empty array deque with an initial capacity
+     * sufficient to hold the specified number of elements.
+     *
+     * @param numElements lower bound on initial capacity of the deque
+	 * @param keep is for keep
+     */
+    public ArrayDeque(int numElements, boolean keep) {
+		int result = numElements + 1;
+        elements = new @Keep Object[result];
+    }
 
 	/**
      * Constructs an empty array deque with an initial capacity

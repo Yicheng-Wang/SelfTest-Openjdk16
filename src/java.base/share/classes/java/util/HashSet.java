@@ -245,11 +245,9 @@ public class HashSet<E>
      * unchanged and returns {@code false}.
      *
      * @param e element to be added to this set
-     * @return {@code true} if this set did not already contain the specified
-     * element
      */
-    public boolean addtest(E e) {
-        return map.puttest(e, PRESENT)==null;
+    public void addtest(E e) {
+        map.puttest(e, PRESENT);
     }
 	
 	/**
