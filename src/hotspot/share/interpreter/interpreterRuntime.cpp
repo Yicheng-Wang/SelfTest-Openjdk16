@@ -312,7 +312,8 @@ JRT_ENTRY(void, InterpreterRuntime::_new(JavaThread* thread, ConstantPool* pool,
   //       Java).
   //       If we have a breakpoint, then we don't rewrite
   //       because the _breakpoint bytecode would be lost.
-  int alloc_gen = get_alloc_gen(thread);
+  int alloc_gen = thread->last_frame().interpreter_frame_method()->alloc_anno() == NULL ? 0 : 1;
+  // int alloc_gen = get_alloc_gen(thread);
   /*if(alloc_gen>0){
       log_info(gc, heap)("Interpreter Keep Alloc Object");
   }*/
@@ -323,7 +324,8 @@ JRT_END
 
 
 JRT_ENTRY(void, InterpreterRuntime::newarray(JavaThread* thread, BasicType type, jint size))
-  int alloc_gen = get_alloc_gen(thread,1);
+  int alloc_gen = thread->last_frame().interpreter_frame_method()->alloc_anno() == NULL ? 0 : 1;
+  // int alloc_gen = get_alloc_gen(thread,1);
   /*if(alloc_gen>0){
       InterpreterRuntime::interkeepalloc++;
       if(InterpreterRuntime::interkeepalloc/(1024)!=(InterpreterRuntime::interkeepalloc-1)/(1024)){
@@ -340,7 +342,8 @@ JRT_END
 
 JRT_ENTRY(void, InterpreterRuntime::anewarray(JavaThread* thread, ConstantPool* pool, int index, jint size))
   Klass*    klass = pool->klass_at(index, CHECK);
-  int alloc_gen = get_alloc_gen(thread, 1);
+  // int alloc_gen = get_alloc_gen(thread, 1);
+  int alloc_gen = thread->last_frame().interpreter_frame_method()->alloc_anno() == NULL ? 0 : 1;
   /*if(alloc_gen>0){
       log_info(gc, heap)("One Keep Object Array");
   }*/

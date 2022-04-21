@@ -1261,19 +1261,7 @@ Node* PhaseMacroExpand::make_store(Node* ctl, Node* mem, Node* base, int offset,
 
 int PhaseMacroExpand::get_alloc_gen_2(Array<u2>* aac, int bci) {
     if (aac != NULL) {
-        for (int i = 0; i < aac->length(); i++) {
-
-            if (bci == aac->at(i)) {
-                // assert(thread != Thread::current(), "sanity");
-                return 1;
-            }
-            // Note: I prefill the array with max_jushort.
-            if (aac->at(i) == max_jushort) {
-                // No cache entry at 'next_centry'
-                return 0;
-                //break;
-            }
-        }
+        return 1;
     }
     return 0;
     /*if(aac != NULL) {
@@ -1332,7 +1320,9 @@ void PhaseMacroExpand::expand_allocate_common(
 {
     /*int bci = alloc->jvms()->bci();
     Method* m = alloc->jvms()->method()->get_Method();*/
-    int alloc_gen = get_alloc_gen_2(alloc->jvms()->method()->get_Method()->alloc_anno_cache(), alloc->jvms()->bci());
+    // char* methodname = alloc->jvms()->method()->get_Method()->name_and_sig_as_C_string();
+    int alloc_gen = alloc->jvms()->method()->get_Method()->alloc_anno_cache() == NULL ? 0 : 1;
+    // int alloc_gen = get_alloc_gen_2(alloc->jvms()->method()->get_Method()->alloc_anno_cache(), alloc->jvms()->bci());
     /*if(length == NULL)
         alloc_gen = get_alloc_gen_2(m, bci, 0);
     else

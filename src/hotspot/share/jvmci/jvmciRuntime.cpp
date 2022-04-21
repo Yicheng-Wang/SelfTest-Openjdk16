@@ -155,8 +155,8 @@ JRT_BLOCK_ENTRY(void, JVMCIRuntime::new_array_common(JavaThread* thread, Klass* 
   if (array_klass->is_typeArray_klass()) {
     BasicType elt_type = TypeArrayKlass::cast(array_klass)->element_type();
     RetryableAllocationMark ram(thread, null_on_fail);
-    int alloc_gen = InterpreterRuntime::get_alloc_gen(thread,1);
-    obj = oopFactory::new_typeArray(alloc_gen, elt_type, length, CHECK);
+    // int alloc_gen = InterpreterRuntime::get_alloc_gen(thread,1);
+    obj = oopFactory::new_typeArray(0, elt_type, length, CHECK);
   } else {
     Handle holder(THREAD, array_klass->klass_holder()); // keep the klass alive
     Klass* elem_klass = ObjArrayKlass::cast(array_klass)->element_klass();
