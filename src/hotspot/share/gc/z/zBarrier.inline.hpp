@@ -295,14 +295,29 @@ inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o)
     if(ZBarrier::non_skipbarrier/(1024)!=(ZBarrier::non_skipbarrier-1)/(1024)) {
         log_info(gc, heap)("Not Jump Load: " SIZE_FORMAT, ZBarrier::non_skipbarrier);
     }*/
+    uintptr_t addr = ZOop::to_address(o);
+
     if(ZDriver::KeepPermit){
-        uintptr_t addr = ZOop::to_address(o);
         if(ZAddress::is_keep(addr) && !during_relocate()){
-            load_barrier_on_oop_slow_path(addr);
+            mark<Follow, Strong, Publish>(addr);
             return o;
         }
     }
-  return barrier<is_good_or_null_fast_path, load_barrier_on_oop_slow_path>(p, o);
+
+    if (is_good_or_null_fast_path(addr)) {
+        return o;
+    }
+
+    // Slow path
+    const uintptr_t good_addr = load_barrier_on_oop_slow_path(addr);
+
+    if (p != NULL) {
+        self_heal<is_good_or_null_fast_path>(p, addr, good_addr);
+    }
+
+    return ZOop::from_address(good_addr);
+
+  //return barrier<is_good_or_null_fast_path, load_barrier_on_oop_slow_path>(p, o);
 }
 
 inline void ZBarrier::load_barrier_on_oop_array(volatile oop* p, size_t length) {
@@ -346,20 +361,24 @@ inline oop ZBarrier::load_barrier_on_phantom_oop_field_preloaded(volatile oop* p
 
 inline void ZBarrier::load_barrier_on_root_oop_field(oop* p) {
   const oop o = *p;
-    /*if(ZAddress::is_keep(ZOop::to_address(o))){
-        if(ZDriver::KeepPermit && !during_relocate())
-            load_barrier_on_oop_slow_path(ZOop::to_address(o));
-        return;
+    /*if(ZDriver::KeepPermit){
+        uintptr_t addr = ZOop::to_address(o);
+        if(ZAddress::is_keep(addr) && !during_relocate()){
+            load_barrier_on_oop_slow_path(addr);
+            return;
+        }
     }*/
   root_barrier<is_good_or_null_fast_path, load_barrier_on_oop_slow_path>(p, o);
 }
 
 inline void ZBarrier::load_barrier_on_invisible_root_oop_field(oop* p) {
   const oop o = *p;
-    /*if(ZAddress::is_keep(ZOop::to_address(o))){
-        if(ZDriver::KeepPermit && !during_relocate())
-            load_barrier_on_invisible_root_oop_slow_path(ZOop::to_address(o));
-        return;
+    /*if(ZDriver::KeepPermit){
+        uintptr_t addr = ZOop::to_address(o);
+        if(ZAddress::is_keep(addr) && !during_relocate()){
+            load_barrier_on_oop_slow_path(addr);
+            return;
+        }
     }*/
   root_barrier<is_good_or_null_fast_path, load_barrier_on_invisible_root_oop_slow_path>(p, o);
 }

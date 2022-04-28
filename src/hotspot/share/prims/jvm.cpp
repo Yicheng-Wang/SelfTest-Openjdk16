@@ -669,7 +669,7 @@ JVM_END
 JVM_ENTRY(jint, JVM_IHashCode(JNIEnv* env, jobject handle))
   JVMWrapper("JVM_IHashCode");
   // as implemented in the classic virtual machine; return 0 if object is NULL
-  return handle == NULL ? 0 : ObjectSynchronizer::FastHashCode (THREAD, JNIHandles::resolve_non_null(handle)) ;
+  return handle == NULL ? 0 : ObjectSynchronizer::FastHashCode (THREAD, *(reinterpret_cast<oop*>(handle))) ;
 JVM_END
 
 

@@ -149,6 +149,19 @@ public class HashSet<E>
     }
 
 
+	/**
+     * Constructs a new, empty set; the backing {@code HashMap} instance has
+     * the specified initial capacity and the specified load factor.
+     *
+     * @param      initialCapacity   the initial capacity of the hash map
+     * @param      testarray        new teste array
+     * @throws     IllegalArgumentException if the initial capacity is less
+     *             than zero, or if the load factor is nonpositive
+     */
+    public HashSet(HashMap<E,Object> testarray) {
+        map = testarray;
+    }
+	
     /**
      * Constructs a new, empty set; the backing {@code HashMap} instance has
      * the specified initial capacity and default load factor (0.75).
