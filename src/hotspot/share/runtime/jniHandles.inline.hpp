@@ -66,11 +66,22 @@ inline oop JNIHandles::resolve_impl(jobject handle) {
 }
 
 inline oop JNIHandles::resolve(jobject handle) {
-  oop result = NULL;
+  //oop result = NULL;
   if (handle != NULL) {
-    result = resolve_impl<DECORATORS_NONE, false /* external_guard */>(handle);
+      oop* result_point = jobject_ptr(handle);
+      oop result = *result_point;
+      if(ZAddress::is_good(ZOop::to_address(result)))
+          return result;
+      else{
+          if (is_jweak(handle)) {       // Unlikely
+              return NativeAccess<ON_PHANTOM_OOP_REF|DECORATORS_NONE>::oop_load(jweak_ptr(handle));
+          } else {
+              return NativeAccess<DECORATORS_NONE>::oop_load(result_point);
+          }
+      }
+    //return resolve_impl<DECORATORS_NONE, false /* external_guard */>(handle);
   }
-  return result;
+  return NULL;
 }
 
 inline oop JNIHandles::resolve_no_keepalive(jobject handle) {
@@ -89,7 +100,18 @@ inline bool JNIHandles::is_same_object(jobject handle1, jobject handle2) {
 
 inline oop JNIHandles::resolve_non_null(jobject handle) {
   assert(handle != NULL, "JNI handle should not be null");
-  oop result = resolve_impl<DECORATORS_NONE, false /* external_guard */>(handle);
+    oop* result_point = jobject_ptr(handle);
+    oop result = *result_point;
+    if(ZAddress::is_good(ZOop::to_address(result)))
+        return result;
+    else{
+        if (is_jweak(handle)) {       // Unlikely
+            return NativeAccess<ON_PHANTOM_OOP_REF|DECORATORS_NONE>::oop_load(jweak_ptr(handle));
+        } else {
+            return NativeAccess<DECORATORS_NONE>::oop_load(result_point);
+        }
+    }
+  //oop result = resolve_impl<DECORATORS_NONE, false /* external_guard */>(handle);
   assert(result != NULL, "NULL read from jni handle");
   return result;
 }
