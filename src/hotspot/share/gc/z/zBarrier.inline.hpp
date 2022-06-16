@@ -224,7 +224,8 @@ inline void ZBarrier::root_barrier(oop* p, oop o) {
 }
 
 inline bool ZBarrier::is_good_or_null_fast_path(uintptr_t addr) {
-  return ZAddress::is_good_or_null(addr);
+  //return ZAddress::is_good_or_null(addr);
+    return !ZAddress::is_bad(addr);
 }
 
 inline bool ZBarrier::is_not_keep_fast_path(uintptr_t addr) {
@@ -304,7 +305,7 @@ inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o)
         }
     }
 
-    if (is_good_or_null_fast_path(addr)) {
+    if (!ZAddress::is_bad(addr)) {
         return o;
     }
 
@@ -320,6 +321,23 @@ inline oop ZBarrier::load_barrier_on_oop_field_preloaded(volatile oop* p, oop o)
   //return barrier<is_good_or_null_fast_path, load_barrier_on_oop_slow_path>(p, o);
 }
 
+inline oop ZBarrier::load_barrier_on_slow_oop(volatile oop* p, oop o) {
+    uintptr_t addr = ZOop::to_address(o);
+
+    if (!ZAddress::is_bad(addr)) {
+        return o;
+    }
+
+    // Slow path
+    const uintptr_t good_addr = load_barrier_on_oop_slow_path(addr);
+
+    if (p != NULL) {
+        self_heal<is_good_or_null_fast_path>(p, addr, good_addr);
+    }
+
+    return ZOop::from_address(good_addr);
+
+}
 inline void ZBarrier::load_barrier_on_oop_array(volatile oop* p, size_t length) {
     /*if(ZAddress::is_keep(ZOop::to_address(Atomic::load(p))) && ZAddress::is_keep(ZOop::to_address(Atomic::load(p + length))) && !ZDriver::KeepPermit){
         return;

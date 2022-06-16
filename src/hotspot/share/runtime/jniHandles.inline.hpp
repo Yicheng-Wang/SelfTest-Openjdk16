@@ -69,8 +69,11 @@ inline oop JNIHandles::resolve(jobject handle) {
   //oop result = NULL;
   if (handle != NULL) {
       oop* result_point = jobject_ptr(handle);
-      oop result = *result_point;
-      if(ZAddress::is_good(ZOop::to_address(result)))
+      //oop result = *result_point;
+      return ZBarrier::load_barrier_on_slow_oop(result_point,*result_point);
+      //return ZAddress::is_good(ZOop::to_address(result))?result:ZBarrier::load_barrier_on_oop_field_preloaded(result_point,result);
+      // return ZBarrier::load_barrier_on_oop_field_preloaded(result_point, *result_point);
+      /*if(ZAddress::is_good(ZOop::to_address(result)))
           return result;
       else{
           if (is_jweak(handle)) {       // Unlikely
@@ -78,7 +81,8 @@ inline oop JNIHandles::resolve(jobject handle) {
           } else {
               return NativeAccess<DECORATORS_NONE>::oop_load(result_point);
           }
-      }
+          return NativeAccess<DECORATORS_NONE>::oop_load(result_point);
+      }*/
     //return resolve_impl<DECORATORS_NONE, false /* external_guard */>(handle);
   }
   return NULL;
@@ -102,7 +106,8 @@ inline oop JNIHandles::resolve_non_null(jobject handle) {
   assert(handle != NULL, "JNI handle should not be null");
     oop* result_point = jobject_ptr(handle);
     oop result = *result_point;
-    if(ZAddress::is_good(ZOop::to_address(result)))
+    return ZBarrier::load_barrier_on_slow_oop(result_point,result);
+    /*if(ZAddress::is_good(ZOop::to_address(result)))
         return result;
     else{
         if (is_jweak(handle)) {       // Unlikely
@@ -110,7 +115,8 @@ inline oop JNIHandles::resolve_non_null(jobject handle) {
         } else {
             return NativeAccess<DECORATORS_NONE>::oop_load(result_point);
         }
-    }
+        return NativeAccess<DECORATORS_NONE>::oop_load(result_point);
+    }*/
   //oop result = resolve_impl<DECORATORS_NONE, false /* external_guard */>(handle);
   assert(result != NULL, "NULL read from jni handle");
   return result;
