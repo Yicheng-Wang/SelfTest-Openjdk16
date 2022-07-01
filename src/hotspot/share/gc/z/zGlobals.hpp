@@ -57,7 +57,7 @@ const uint8_t     ZPageTypeMedium               = 1;
 const uint8_t     ZPageTypeLarge                = 2;
 
 // Page size shifts
-const size_t      ZPageSizeSmallShift           = ZGranuleSizeShift;
+const size_t      ZPageSizeSmallShift           = ZGranuleSizeShift + 2;
 extern size_t     ZPageSizeMediumShift;
 
 // Page sizes
@@ -65,7 +65,7 @@ const size_t      ZPageSizeSmall                = (size_t)1 << ZPageSizeSmallShi
 extern size_t     ZPageSizeMedium;
 
 // Object size limits
-const size_t      ZObjectSizeLimitSmall         = ZPageSizeSmall / 8; // 12.5% max waste
+const size_t      ZObjectSizeLimitSmall         = ZPageSizeSmall / 32; // 12.5% max waste
 extern size_t     ZObjectSizeLimitMedium;
 
 // Object alignment shifts

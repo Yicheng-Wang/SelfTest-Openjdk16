@@ -51,8 +51,8 @@ class ZForwardingEntry {
 
 private:
   typedef ZBitField<uint64_t, bool,   0,   1> field_populated;
-  typedef ZBitField<uint64_t, size_t, 1,  45> field_to_offset;
-  typedef ZBitField<uint64_t, size_t, 46, 18> field_from_index;
+  typedef ZBitField<uint64_t, size_t, 1,  43> field_to_offset;
+  typedef ZBitField<uint64_t, size_t, 44, 20> field_from_index;
 
   uint64_t _entry;
 
