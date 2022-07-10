@@ -360,6 +360,35 @@ public abstract class $Type$Buffer
             throw createCapacityException(capacity);
         return new Heap$Type$Buffer(capacity, capacity, null);
     }
+	
+	 /**
+     * Allocates a new keep $type$ buffer.
+     *
+     * <p> The new buffer's position will be zero, its limit will be its
+     * capacity, its mark will be undefined, each of its elements will be
+     * initialized to zero, and its byte order will be
+#if[byte]
+     * {@link ByteOrder#BIG_ENDIAN BIG_ENDIAN}.
+#else[byte]
+     * the {@link ByteOrder#nativeOrder native order} of the underlying
+     * hardware.
+#end[byte]
+     * It will have a {@link #array backing array}, and its
+     * {@link #arrayOffset array offset} will be zero.
+     *
+     * @param  capacity
+     *         The new buffer's capacity, in $type$s
+     *
+     * @return  The new $type$ buffer
+     *
+     * @throws  IllegalArgumentException
+     *          If the {@code capacity} is a negative integer
+     */
+    public static $Type$Buffer allocatekeep(int capacity) {
+        if (capacity < 0)
+            throw createCapacityException(capacity);
+        return new @Keep Heap$Type$Buffer(capacity, capacity, null, true);
+    }
 
     /**
      * Wraps $a$ $type$ array into a buffer.

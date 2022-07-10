@@ -72,6 +72,20 @@ class Heap$Type$Buffer$RW$
         this.isReadOnly = true;
 #end[rw]
     }
+	
+	Heap$Type$Buffer$RW$(int cap, int lim, MemorySegmentProxy segment, boolean keep) {            // package-private
+#if[rw]
+        super(-1, 0, lim, cap, new @Keep $type$[cap], 0, segment);
+        /*
+        hb = new $type$[cap];
+        offset = 0;
+        */
+        this.address = ARRAY_BASE_OFFSET;
+#else[rw]
+        super(cap, lim, segment);
+        this.isReadOnly = true;
+#end[rw]
+    }
 
     Heap$Type$Buffer$RW$($type$[] buf, int off, int len, MemorySegmentProxy segment) { // package-private
 #if[rw]

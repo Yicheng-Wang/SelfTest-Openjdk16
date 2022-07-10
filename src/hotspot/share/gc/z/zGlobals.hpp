@@ -65,6 +65,7 @@ const size_t      ZPageSizeSmall                = (size_t)1 << ZPageSizeSmallShi
 extern size_t     ZPageSizeMedium;
 
 // Object size limits
+
 const size_t      ZObjectSizeLimitSmall         = ZPageSizeSmall / 32; // 12.5% max waste
 extern size_t     ZObjectSizeLimitMedium;
 
